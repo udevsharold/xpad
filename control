@@ -1,0 +1,12 @@
+Package: com.udevs.xpad
+Name: XPad
+Depends: mobilesubstrate, com.rpetrich.rocketbootstrap (>= 1.0.2), firmware(>=13.0), ws.hbang.alderis
+Version: 2.1.5
+Architecture: iphoneos-arm
+Description: Pasteboard shortcuts on keyboard for iPad
+Maintainer: udevs
+Author: udevs
+Section: Tweaks
+Conflicts: com.udevs.dockx
+Icon: https://udevsharold.github.io/repo/depictions/com.udevs.xpad/icon/icon.png
+Depiction: https://udevsharold.github.io/repo/depictions/?p=com.udevs.xpad
