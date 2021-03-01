@@ -9,7 +9,7 @@ XPadPrefs_INSTALL_PATH = /Library/PreferenceBundles
 XPadPrefs_FRAMEWORKS = UIKit
 XPadPrefs_PRIVATE_FRAMEWORKS = Preferences AppSupport
 XPadPrefs_CFLAGS = -fobjc-arc
-XPadPrefs_LIBRARIES = rocketbootstrap colorpicker
+XPadPrefs_LIBRARIES = rocketbootstrap sparkcolourpicker
 
 
 include $(THEOS_MAKE_PATH)/bundle.mk

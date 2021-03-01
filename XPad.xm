@@ -1,6 +1,6 @@
 #include "common.h"
 #include "XPad.h"
-#import <libcolorpicker.h>
+#import <SparkColourPicker/SparkColourPickerUtils.h>
 #import <UIKit/UIKit.h>
 #import <objc/runtime.h>
 #import <Foundation/Foundation.h>
@@ -3422,10 +3422,11 @@ static void reloadPrefs() {
     
     if (preferencesBool(kColorEnabledkey,NO)){
         
-        if (preferencesBool(kShortcutsTintEnabled,YES)) currentTintColor = LCPParseColorString(prefs[@"shortcutstint"], @"#ff0000");
-        if (preferencesBool(kToastTintEnabled,YES)) toastTintColor = LCPParseColorString(prefs[@"toasttint"], @"#ff0000");
-        if (preferencesBool(kToastBackgroundTintEnabled,YES)) toastBackgroundTintColor = LCPParseColorString(prefs[@"toastbackgroundtint"], @"#000000");
+        if (preferencesBool(kShortcutsTintEnabled,YES)) currentTintColor = [SparkColourPickerUtils colourWithString:prefs[@"shortcutstint"]  withFallback:@"#ff0000"];
+        if (preferencesBool(kToastTintEnabled,YES)) toastTintColor = [SparkColourPickerUtils colourWithString:prefs[@"toasttint"]  withFallback:@"#ff0000"];
+        if (preferencesBool(kToastBackgroundTintEnabled,YES)) toastBackgroundTintColor = [SparkColourPickerUtils colourWithString:prefs[@"toastbackgroundtint"]  withFallback:@"#000000"];
     }
+    
     doubleTapEnabled = preferencesBool(kEnabledDoubleTapkey, NO);
     
     if (isSpringBoard && !firstInit){
