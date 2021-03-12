@@ -242,6 +242,9 @@ NSString *preferencesSelectorForIdentifier(NSString* identifier, int selectorNum
                     if ([selectorName isEqualToString:@"pasitheaAction:"] && !self.shortcutsGenerator.pasitheaDylibExist){
                         continue;
                     }
+                    if ([selectorName isEqualToString:@"copypastaAction:"] && !self.shortcutsGenerator.copypastaDylibExist){
+                        continue;
+                    }
                     
                     
                     UIBarButtonItem *shortcutButton = [[UIBarButtonItem alloc] initWithImage:[XPadHelper imageForName:item[@"images"] withSystemColor:NO completion:nil] style:UIBarButtonItemStylePlain target:self action:NSSelectorFromString(selectorName)];
@@ -349,7 +352,8 @@ NSString *preferencesSelectorForIdentifier(NSString* identifier, int selectorNum
                 [archiver encodeObject:@(self.shortcutsGenerator.translomaticDylibExist) forKey:@"translomaticDylibExist"];
                 [archiver encodeObject:@(self.shortcutsGenerator.wasabiDylibExist) forKey:@"wasabiDylibExist"];
                 [archiver encodeObject:@(self.shortcutsGenerator.pasitheaDylibExist) forKey:@"pasitheaDylibExist"];
-                
+                [archiver encodeObject:@(self.shortcutsGenerator.copypastaDylibExist) forKey:@"copypastaDylibExist"];
+
                 [archiver finishEncoding];
                 //NSLog(@"XPAD: %@", error);
                 
@@ -2168,6 +2172,14 @@ NSString *preferencesSelectorForIdentifier(NSString* identifier, int selectorNum
     CFNotificationCenterPostNotification(CFNotificationCenterGetDarwinNotifyCenter(), (CFStringRef)kPasitheaOpenVewIdentifier, NULL, NULL, YES);
 }
 
+-(void)copypastaAction:(UIBarButtonItem*)sender{
+    if (!self.shortcutsGenerator.pasitheaDylibExist){
+           return;
+       }
+    [self triggerImpactAndAnimationWithButton:sender selectorName:NSStringFromSelector(_cmd) toastWidthOffset:0 toastHeightOffset:0];
+    showCopypastaWithNotification();
+}
+
 -(void)globeAction:(UIBarButtonItem*)sender{
     [self triggerImpactAndAnimationWithButton:sender selectorName:NSStringFromSelector(_cmd) toastWidthOffset:0 toastHeightOffset:0];
     UIKeyboardInputModeController *kbController = [objc_getClass("UIKeyboardInputModeController") sharedInputModeController];
@@ -3443,8 +3455,8 @@ static void reloadPrefs() {
 
                 NSKeyedUnarchiver *unarchiver = [[NSKeyedUnarchiver alloc] initForReadingFromData:prefs[kCachekey] error:nil];
                 unarchiver.requiresSecureCoding = NO;
-                int cacheDylibSum = [[unarchiver decodeObjectForKey:@"copyLogDylibExist"] intValue] + [[unarchiver decodeObjectForKey:@"translomaticDylibExist"] intValue] + [[unarchiver decodeObjectForKey:@"wasabiDylibExist"] intValue] + [[unarchiver decodeObjectForKey:@"pasitheaDylibExist"] intValue];
-                int actualDylibSum = [@(shortcutsGenerator.copyLogDylibExist) intValue] + [@(shortcutsGenerator.translomaticDylibExist) intValue] + [@(shortcutsGenerator.wasabiDylibExist) intValue] + [@(shortcutsGenerator.pasitheaDylibExist) intValue];
+                int cacheDylibSum = [[unarchiver decodeObjectForKey:@"copyLogDylibExist"] intValue] + [[unarchiver decodeObjectForKey:@"translomaticDylibExist"] intValue] + [[unarchiver decodeObjectForKey:@"wasabiDylibExist"] intValue] + [[unarchiver decodeObjectForKey:@"pasitheaDylibExist"] intValue] + [[unarchiver decodeObjectForKey:@"copypastaDylibExist"] intValue];
+                int actualDylibSum = [@(shortcutsGenerator.copyLogDylibExist) intValue] + [@(shortcutsGenerator.translomaticDylibExist) intValue] + [@(shortcutsGenerator.wasabiDylibExist) intValue] + [@(shortcutsGenerator.pasitheaDylibExist) intValue] + [@(shortcutsGenerator.copypastaDylibExist) intValue];
                 [unarchiver finishDecoding];
 
                 //NSLog(@"XPAD cache: %d ** actual: %d", cacheDylibSum, actualDylibSum);

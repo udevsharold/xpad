@@ -1,12 +1,6 @@
 #include "common.h"
 #include "ShortcutsGenerator.h"
 
-#define copyLogDylib @"/Library/MobileSubstrate/DynamicLibraries/CopyLog.dylib"
-#define translomaticDylib @"/Library/MobileSubstrate/DynamicLibraries/Translomatic.dylib"
-#define wasabiDylib @"/Library/MobileSubstrate/DynamicLibraries/Wasabi.dylib"
-#define pasitheaDylib @"/Library/MobileSubstrate/DynamicLibraries/Pasithea2.dylib"
-
-
 @implementation ShortcutsGenerator
 
 +(void)load{
@@ -46,6 +40,7 @@
         self.translomaticDylibExist = [self dylibExist:translomaticDylib manager:fileManager];
         self.wasabiDylibExist = [self dylibExist:wasabiDylib manager:fileManager];
         self.pasitheaDylibExist = [self dylibExist:pasitheaDylib manager:fileManager];
+        self.copypastaDylibExist = [self dylibExist:copypastaDylib manager:fileManager];
     }
     return self;
 }
@@ -109,6 +104,13 @@
             [thirdPartArray addObject:@"rectangle.and.paperclip"];
         }
     }
+    if (self.copypastaDylibExist){
+        if (iosVersion == 0){
+            [thirdPartArray addObject:@"UIButtonBarCompose"];
+        }else{
+            [thirdPartArray addObject:@"rectangle.and.paperclip"];
+        }
+    }
     return thirdPartArray;
 }
 
@@ -142,6 +144,13 @@
             [thirdPartArray addObject:@"pasitheaAction:"];
         }
     }
+    if (self.copypastaDylibExist){
+        if (longPress){
+            [thirdPartArray addObject:@"copypastaActionLP:"];
+        }else{
+            [thirdPartArray addObject:@"copypastaAction:"];
+        }
+    }
     return thirdPartArray;
 }
 
@@ -158,6 +167,9 @@
     }
     if (self.pasitheaDylibExist){
         [thirdPartArray addObject:@"Pasithea"];
+    }
+    if (self.copypastaDylibExist){
+        [thirdPartArray addObject:@"Copypasta"];
     }
     return thirdPartArray;
 }

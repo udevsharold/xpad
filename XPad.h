@@ -2,6 +2,16 @@
 #import <RocketBootstrap/rocketbootstrap.h>
 #include "ShortcutsGenerator.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+void showCopypastaWithNotification() __attribute__((weak));
+
+#ifdef __cplusplus
+}
+#endif
+
 @interface UIKeyboardExtensionInputMode : UITextInputMode
 -(BOOL)isDefaultRightToLeft;
 @end

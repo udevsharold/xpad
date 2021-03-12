@@ -1,7 +1,7 @@
-ARCHS = arm64 arm64e
+export ARCHS = arm64 arm64e
 
-DEBUG=0
-FINALPACKAGE=1
+export DEBUG=0
+export FINALPACKAGE=1
 
 export PREFIX = $(THEOS)/toolchain/Xcode11.xctoolchain/usr/bin/
 
@@ -17,6 +17,7 @@ XPad_FILES = $(wildcard *.xm) $(wildcard *.x) $(wildcard *.m)
 XPad_CFLAGS = -fobjc-arc
 XPad_LIBRARIES = rocketbootstrap sparkcolourpicker
 XPad_PRIVATE_FRAMEWORKS = AppSupport Preferences
+XPad_LDFLAGS = -Wl,-U,_showCopypastaWithNotification
 
 include $(THEOS_MAKE_PATH)/tweak.mk
 SUBPROJECTS += xpadprefs

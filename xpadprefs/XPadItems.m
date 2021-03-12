@@ -459,12 +459,9 @@ static BOOL translomaticInstalled = NO;
         //[prefs removeObjectForKey:kCustomActionskey];
         [[PrefsManager sharedInstance] writePrefs:prefs];
     }
-    
+
     //NSArray *defaultOrder = @[@"Select All", @"Copy", @"Paste", @"Cut", @"Undo", @"Redo"];
-    BOOL newShortcutsAvailable = NO;
-    if (prefs[@"shortcuts"] && ([prefs[@"shortcuts"] firstObject] != nil)){
-        newShortcutsAvailable = defaultOrderLabel.count > ((NSArray *)prefs[@"shortcuts"][0]).count + ((NSArray *)prefs[@"shortcuts"][1]).count;
-    }
+    BOOL newShortcutsAvailable = YES;
     self.currentOrder = [NSMutableArray array];
     self.currentOrder[0] = [NSMutableArray array];
     self.currentOrder[1] = [NSMutableArray array];
@@ -475,6 +472,7 @@ static BOOL translomaticInstalled = NO;
             if ([[currentOrderDefault objectAtIndex:i][@"selector"] isEqualToString:@"translomaticAction:"] && !shortcutsGenerator.translomaticDylibExist) continue;
             if ([[currentOrderDefault objectAtIndex:i][@"selector"] isEqualToString:@"wasabiAction:"] && !shortcutsGenerator.wasabiDylibExist) continue;
             if ([[currentOrderDefault objectAtIndex:i][@"selector"] isEqualToString:@"pasitheaAction:"] && !shortcutsGenerator.pasitheaDylibExist) continue;
+            if ([[currentOrderDefault objectAtIndex:i][@"selector"] isEqualToString:@"copypastaAction:"] && !shortcutsGenerator.copypastaDylibExist) continue;
             [self.currentOrder[0] addObject:[currentOrderDefault objectAtIndex:i]];
         }
     }else{
@@ -486,6 +484,7 @@ static BOOL translomaticInstalled = NO;
             if ([defaultOrderSelector[i] isEqualToString:@"translomaticAction:"] && !shortcutsGenerator.translomaticDylibExist) continue;
             if ([defaultOrderSelector[i] isEqualToString:@"wasabiAction:"] && !shortcutsGenerator.wasabiDylibExist) continue;
             if ([defaultOrderSelector[i] isEqualToString:@"pasitheaAction:"] && !shortcutsGenerator.pasitheaDylibExist) continue;
+            if ([defaultOrderSelector[i] isEqualToString:@"copypastaAction:"] && !shortcutsGenerator.copypastaDylibExist) continue;
             [defaultOrderDict addObject: @{
                 @"label" : defaultOrderLabel[i],
                 @"images" : defaultOrderImages[i],
@@ -502,6 +501,7 @@ static BOOL translomaticInstalled = NO;
             if ([[currentOrderDefault objectAtIndex:i][@"selector"] isEqualToString:@"translomaticAction:"] && !shortcutsGenerator.translomaticDylibExist) continue;
             if ([[currentOrderDefault objectAtIndex:i][@"selector"] isEqualToString:@"wasabiAction:"] && !shortcutsGenerator.wasabiDylibExist) continue;
             if ([[currentOrderDefault objectAtIndex:i][@"selector"] isEqualToString:@"pasitheaAction:"] && !shortcutsGenerator.pasitheaDylibExist) continue;
+            if ([[currentOrderDefault objectAtIndex:i][@"selector"] isEqualToString:@"copypastaAction:"] && !shortcutsGenerator.copypastaDylibExist) continue;
             [self.currentOrder[1] addObject:[currentOrderDefault objectAtIndex:i]];
         }
         if (newShortcutsAvailable){
@@ -511,6 +511,7 @@ static BOOL translomaticInstalled = NO;
                 if ([[defaultOrderSelector objectAtIndex:i] isEqualToString:@"translomaticAction:"] && !shortcutsGenerator.translomaticDylibExist) continue;
                 if ([[defaultOrderSelector objectAtIndex:i] isEqualToString:@"wasabiAction:"] && !shortcutsGenerator.wasabiDylibExist) continue;
                 if ([[defaultOrderSelector objectAtIndex:i] isEqualToString:@"pasitheaAction:"] && !shortcutsGenerator.pasitheaDylibExist) continue;
+                if ([[defaultOrderSelector objectAtIndex:i] isEqualToString:@"copypastaAction:"] && !shortcutsGenerator.copypastaDylibExist) continue;
                 [fullOrderDict addObject: @{
                     @"label" : defaultOrderLabel[i],
                     @"images" : defaultOrderImages[i],
@@ -535,6 +536,7 @@ static BOOL translomaticInstalled = NO;
             if ([defaultOrderSelector[i] isEqualToString:@"translomaticAction:"] && !shortcutsGenerator.translomaticDylibExist) continue;
             if ([defaultOrderSelector[i] isEqualToString:@"wasabiAction:"] && !shortcutsGenerator.wasabiDylibExist) continue;
             if ([defaultOrderSelector[i] isEqualToString:@"pasitheaAction:"] && !shortcutsGenerator.pasitheaDylibExist) continue;
+            if ([defaultOrderSelector[i] isEqualToString:@"copypastaAction:"] && !shortcutsGenerator.copypastaDylibExist) continue;
             [defaultOrderDict addObject: @{
                 @"label" : defaultOrderLabel[i],
                 @"images" : defaultOrderImages[i],
