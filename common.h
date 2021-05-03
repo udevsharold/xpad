@@ -14,6 +14,7 @@
 #define kPrefsChangedIdentifier @"com.udevs.xpad/prefschanged"
 #define kAutoCorrectionChangedIdentifier @"com.udevs.xpad/autocorrectionchanged"
 #define kAutoCapitalizationChangedIdentifier @"com.udevs.xpad/autocapitalizationchanged"
+#define kLoupeChangedIdentifier @"com.udevs.xpad/loupechanged"
 #define kPrefsPath @"/var/mobile/Library/Preferences/com.udevs.xpad.plist"
 
 #define kCopyLogOpenVewIdentifier @"me.tomt000.copylog.showView"

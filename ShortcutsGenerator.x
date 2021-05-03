@@ -41,6 +41,7 @@
         self.wasabiDylibExist = [self dylibExist:wasabiDylib manager:fileManager];
         self.pasitheaDylibExist = [self dylibExist:pasitheaDylib manager:fileManager];
         self.copypastaDylibExist = [self dylibExist:copypastaDylib manager:fileManager];
+        self.loupeDylibExist = [self dylibExist:loupeDylib manager:fileManager];
     }
     return self;
 }
@@ -111,6 +112,13 @@
             [thirdPartArray addObject:@"rectangle.and.paperclip"];
         }
     }
+    if (self.loupeDylibExist){
+        if (iosVersion == 0){
+            [thirdPartArray addObject:@"kb-loupe-hi"];
+        }else{
+            [thirdPartArray addObject:@"magnifyingglass.circle.fill"];
+        }
+    }
     return thirdPartArray;
 }
 
@@ -151,6 +159,13 @@
             [thirdPartArray addObject:@"copypastaAction:"];
         }
     }
+    if (self.loupeDylibExist){
+        if (longPress){
+            [thirdPartArray addObject:@"loupeActionLP:"];
+        }else{
+            [thirdPartArray addObject:@"loupeAction:"];
+        }
+    }
     return thirdPartArray;
 }
 
@@ -170,6 +185,9 @@
     }
     if (self.copypastaDylibExist){
         [thirdPartArray addObject:@"Copypasta"];
+    }
+    if (self.loupeDylibExist){
+        [thirdPartArray addObject:@"Loupe"];
     }
     return thirdPartArray;
 }

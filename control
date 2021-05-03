@@ -1,7 +1,7 @@
 Package: com.udevs.xpad
 Name: XPad
 Depends: mobilesubstrate, preferenceloader, com.rpetrich.rocketbootstrap (>= 1.0.2), firmware(>=13.0), com.spark.libsparkcolourpicker
-Version: 2.2.0
+Version: 2.2.1
 Architecture: iphoneos-arm
 Description: Pasteboard shortcuts on keyboard for iPad
 Maintainer: udevs

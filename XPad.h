@@ -7,6 +7,8 @@ extern "C" {
 #endif
 
 void showCopypastaWithNotification() __attribute__((weak));
+void flipLoupeEnableSwitch(BOOL enable) __attribute__((weak));
+BOOL loupeSwitchState() __attribute__((weak));
 
 #ifdef __cplusplus
 }
@@ -166,8 +168,10 @@ void showCopypastaWithNotification() __attribute__((weak));
 @property (strong, nonatomic) UIBarButtonItem *autoCorrectionButton;
 @property (strong, nonatomic) UIBarButtonItem *autoCapitalizationButton;
 @property (strong, nonatomic) UIBarButtonItem *keyboardInputTypeButton;
+@property (strong, nonatomic) UIBarButtonItem *loupeButton;
 @property (nonatomic, assign) BOOL autoCorrectionEnabled;
 @property (nonatomic, assign) BOOL autoCapitalizationEnabled;
+@property (nonatomic, assign) BOOL loupeEnabled;
 @property (nonatomic, strong) dispatch_block_t retestDispatchBlock;
 @property (strong, nonatomic) CPDistributedMessagingCenter *xpadCenter;
 @property (strong, nonatomic) CPDistributedMessagingCenter *toastCenter;

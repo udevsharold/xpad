@@ -17,7 +17,7 @@ XPad_FILES = $(wildcard *.xm) $(wildcard *.x) $(wildcard *.m)
 XPad_CFLAGS = -fobjc-arc
 XPad_LIBRARIES = rocketbootstrap sparkcolourpicker
 XPad_PRIVATE_FRAMEWORKS = AppSupport Preferences
-XPad_LDFLAGS = -Wl,-U,_showCopypastaWithNotification
+XPad_LDFLAGS = -Wl,-U,_showCopypastaWithNotification -Wl,-U,_flipLoupeEnableSwitch -Wl,-U,_loupeSwitchState
 
 include $(THEOS_MAKE_PATH)/tweak.mk
 SUBPROJECTS += xpadprefs

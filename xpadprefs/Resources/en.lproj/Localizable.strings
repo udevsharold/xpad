@@ -48,6 +48,8 @@
 "SHORT_TRANSLOMATIC" = "Trsmtc";
 "SHORT_WASABI" = "Wsbi";
 "SHORT_PASITHEA" = "Psthea";
+"SHORT_COPYPASTA" = "Copypasta";
+"SHORT_LOUPE" = "Loupe";
 "SHORT_SPONGEBOB" = "sPoNge";
 
 //=====================Long Text for Shortcuts=====================
@@ -97,6 +99,8 @@
 "LONG_TRANSLOMATIC" = "Translomatic";
 "LONG_WASABI" = "Wasabi";
 "LONG_PASITHEA" = "Pasithea";
+"LONG_COPYPASTA" = "Copypasta";
+"LONG_LOUPE" = "Loupe";
 "LONG_SPONGEBOB" = "sPonGeBob teXt";
 
 //=====================Toast=====================
@@ -145,6 +149,8 @@
 "TOAST_TRANSLOMATIC" = "Translomatic";
 "TOAST_WASABI" = "Wasabi";
 "TOAST_PASITHEA" = "Pasithea";
+"TOAST_COPYPASTA" = "Copypasta";
+"TOAST_LOUPE" = "Loupe";
 "TOAST_SPONGEBOB" = "sPoNge";
 "TOAST_ON" = "On";
 "TOAST_OFF" = "Off";

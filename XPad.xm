@@ -152,6 +152,21 @@ NSString *preferencesSelectorForIdentifier(NSString* identifier, int selectorNum
     self.autoCapitalizationButton.image = [XPadHelper imageForName:self.autoCapitalizationEnabled?@"shift.fill":@"shift" withSystemColor:NO completion:nil];
 }
 
+-(void)updateLoupeButton{
+    if (!self.shortcutsGenerator.loupeDylibExist){
+        return;
+    }
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        self.loupeEnabled = loupeSwitchState();
+        dispatch_async(dispatch_get_main_queue(), ^{
+            self.isSameProcess = NO;
+            self.asyncUpdated = YES;
+            [self updateLoupe:nil];
+        });
+    });
+    self.loupeButton.image = [XPadHelper imageForName:self.loupeEnabled?@"magnifyingglass.circle.fill":@"magnifyingglass.circle" withSystemColor:NO completion:nil];
+}
+
 -(void)updateKeyboardTypeButton{
     dispatch_async(dispatch_get_main_queue(), ^{
         kbImpl = [%c(UIKeyboardImpl) activeInstance];
@@ -185,6 +200,9 @@ NSString *preferencesSelectorForIdentifier(NSString* identifier, int selectorNum
             self.autoCorrectionButton = [unarchiver decodeObjectForKey:@"autoCorrectionButton"];
             self.autoCapitalizationButton = [unarchiver decodeObjectForKey:@"autoCapitalizationButton"];
             self.keyboardInputTypeButton = [unarchiver decodeObjectForKey:@"keyboardInputTypeButton"];
+            if (self.shortcutsGenerator.loupeDylibExist){
+                self.loupeButton = [unarchiver decodeObjectForKey:@"loupeButton"];
+            }
             [unarchiver finishDecoding];
             
             NSArray *tagsShortcuts = [self.XPadShortcuts valueForKey:@"tag"];
@@ -202,6 +220,11 @@ NSString *preferencesSelectorForIdentifier(NSString* identifier, int selectorNum
             }
             if ([tagsShortcuts containsObject:@102] || [tagsShortcutsBundle containsObject:@102]){
                 [self updateKeyboardTypeButton];
+            }
+            if (self.shortcutsGenerator.loupeDylibExist){
+                if ([tagsShortcuts containsObject:@103] || [tagsShortcutsBundle containsObject:@103]){
+                    [self updateLoupeButton];
+                }
             }
             //NSLog(@"XPAD: %@", error);
             //NSLog(@"XPAD Utilized cache");
@@ -245,7 +268,9 @@ NSString *preferencesSelectorForIdentifier(NSString* identifier, int selectorNum
                     if ([selectorName isEqualToString:@"copypastaAction:"] && !self.shortcutsGenerator.copypastaDylibExist){
                         continue;
                     }
-                    
+                    if ([selectorName isEqualToString:@"loupeAction:"] && !self.shortcutsGenerator.loupeDylibExist){
+                        continue;
+                    }
                     
                     UIBarButtonItem *shortcutButton = [[UIBarButtonItem alloc] initWithImage:[XPadHelper imageForName:item[@"images"] withSystemColor:NO completion:nil] style:UIBarButtonItemStylePlain target:self action:NSSelectorFromString(selectorName)];
                     shortcutButton.tintColor = currentTintColor;
@@ -261,6 +286,10 @@ NSString *preferencesSelectorForIdentifier(NSString* identifier, int selectorNum
                         shortcutButton.tag = 102;
                         self.keyboardInputTypeButton = shortcutButton;
                         [self updateKeyboardTypeButton];
+                    }else if ([selectorName isEqualToString:@"loupeAction:"]){
+                        shortcutButton.tag = 103;
+                        self.loupeButton = shortcutButton;
+                        [self updateLoupeButton];
                     }
                     if (i < preferencesInt(kMaxVisiblekey, maxBeforeBundle)){
                         [self.XPadShortcuts addObject:shortcutButton];
@@ -286,7 +315,12 @@ NSString *preferencesSelectorForIdentifier(NSString* identifier, int selectorNum
                         [self updateAutoCapitalizationButton];
                     }else if ([selectorName isEqualToString:@"keyboardTypeAction:"]){
                         shortcutButton.tag = 102;
+                        self.keyboardInputTypeButton = shortcutButton;
                         [self updateKeyboardTypeButton];
+                    }else if ([selectorName isEqualToString:@"loupeAction:"]){
+                        shortcutButton.tag = 103;
+                        self.loupeButton = shortcutButton;
+                        [self updateLoupeButton];
                     }
                     if (i < preferencesInt(kMaxVisiblekey, maxBeforeBundle)){
                         [self.XPadShortcuts addObject:shortcutButton];
@@ -347,12 +381,14 @@ NSString *preferencesSelectorForIdentifier(NSString* identifier, int selectorNum
                 [archiver encodeObject:self.autoCorrectionButton forKey:@"autoCorrectionButton"];
                 [archiver encodeObject:self.autoCapitalizationButton forKey:@"autoCapitalizationButton"];
                 [archiver encodeObject:self.keyboardInputTypeButton forKey:@"keyboardInputTypeButton"];
-                
+                [archiver encodeObject:self.loupeButton forKey:@"loupeButton"];
+
                 [archiver encodeObject:@(self.shortcutsGenerator.copyLogDylibExist) forKey:@"copyLogDylibExist"];
                 [archiver encodeObject:@(self.shortcutsGenerator.translomaticDylibExist) forKey:@"translomaticDylibExist"];
                 [archiver encodeObject:@(self.shortcutsGenerator.wasabiDylibExist) forKey:@"wasabiDylibExist"];
                 [archiver encodeObject:@(self.shortcutsGenerator.pasitheaDylibExist) forKey:@"pasitheaDylibExist"];
                 [archiver encodeObject:@(self.shortcutsGenerator.copypastaDylibExist) forKey:@"copypastaDylibExist"];
+                [archiver encodeObject:@(self.shortcutsGenerator.loupeDylibExist) forKey:@"loupeDylibExist"];
 
                 [archiver finishEncoding];
                 //NSLog(@"XPAD: %@", error);
@@ -393,6 +429,9 @@ NSString *preferencesSelectorForIdentifier(NSString* identifier, int selectorNum
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
             self.autoCorrectionEnabled = [self isAutoCorrectionEnabled];
             self.autoCapitalizationEnabled = [self isAutoCapitalizationEnabled];
+            if (self.shortcutsGenerator.loupeDylibExist){
+                self.loupeEnabled = loupeSwitchState();
+            }
         });
         
         //self.autoCorrectionEnabled = [self isAutoCorrectionEnabled];
@@ -406,7 +445,8 @@ NSString *preferencesSelectorForIdentifier(NSString* identifier, int selectorNum
         
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateAutoCorrection:) name:@"updateAutoCorrection" object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateAutoCapitalization:) name:@"updateAutoCapitalization" object:nil];
-        
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateLoupe:) name:@"updateLoupe" object:nil];
+
         //NSData *data = [NSKeyedArchiver
         //archivedDataWithRootObject:self requiringSecureCoding:NO error:&error];
         //NSLog(@"XPAD: %@", error);
@@ -425,6 +465,7 @@ NSString *preferencesSelectorForIdentifier(NSString* identifier, int selectorNum
 - (void)dealloc {
     [[NSNotificationCenter defaultCenter] removeObserver:self name:@"updateAutoCorrection" object:nil];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:@"updateAutoCapitalization" object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:@"updateLoupe" object:nil];
 }
 
 -(UITextRange *)selectedWordTextRangeWithDelegate:(id<UITextInput>)delegate{
@@ -872,6 +913,8 @@ NSString *preferencesSelectorForIdentifier(NSString* identifier, int selectorNum
         return  !self.autoCorrectionEnabled?@"checkmark.circle.fill":@"checkmark.circle";
     }else if ([actionname isEqualToString:@"autoCapitalizationAction:"]){
         return  !self.autoCapitalizationEnabled?@"shift.fill":@"shift";
+    }else if ([actionname isEqualToString:@"loupeAction:"]){
+        return  !self.loupeEnabled?@"magnifyingglass.circle.fill":@"magnifyingglass.circle";
     }
     
     NSPredicate *predicate = [NSPredicate predicateWithFormat:@"SELF contains[cd] %@", actionname];
@@ -978,6 +1021,8 @@ NSString *preferencesSelectorForIdentifier(NSString* identifier, int selectorNum
             actionName = !self.autoCorrectionEnabled?LOCALIZED(@"TOAST_ON"):LOCALIZED(@"TOAST_OFF");
         }else if ([selname isEqualToString:@"autoCapitalizationAction:"]){
             actionName = !self.autoCapitalizationEnabled?LOCALIZED(@"TOAST_ON"):LOCALIZED(@"TOAST_OFF");
+        }else if ([selname isEqualToString:@"loupeAction:"]){
+            actionName = !self.loupeEnabled?LOCALIZED(@"TOAST_ON"):LOCALIZED(@"TOAST_OFF");
         }
         /*
          else if ([selname isEqualToString:@"insertTextAction:"]){
@@ -1983,6 +2028,37 @@ NSString *preferencesSelectorForIdentifier(NSString* identifier, int selectorNum
     UIImage *image;
     image = [UIImage systemImageNamed:[delegate respondsToSelector:@selector(keyboardType)]?@"number.circle.fill":@"number.circle"];
     self.keyboardInputTypeButton.image = image;
+}
+
+-(void)loupeAction:(UIBarButtonItem*)sender{
+    if (!self.shortcutsGenerator.loupeDylibExist){
+        return;
+    }
+    self.loupeEnabled = loupeSwitchState();
+    flipLoupeEnableSwitch(!self.loupeEnabled);
+    self.isSameProcess = YES;
+    [self triggerImpactAndAnimationWithButton:sender selectorName:NSStringFromSelector(_cmd) toastWidthOffset:0 toastHeightOffset:0];
+    
+    //sender.highlighted = !autoCorrectionEnabled;
+    //sender.selected = !autoCorrectionEnabled;
+    UIImage *image;
+    image = [UIImage systemImageNamed:(!self.loupeEnabled?@"magnifyingglass.circle.fill":@"magnifyingglass.circle")];
+    sender.image = image;
+
+    CFNotificationCenterPostNotification(CFNotificationCenterGetDarwinNotifyCenter(), (CFStringRef)kLoupeChangedIdentifier, NULL, NULL, YES);
+}
+
+-(void)updateLoupe:(NSNotification*)notification{
+    if (!self.shortcutsGenerator.loupeDylibExist){
+        return;
+    }
+    if (!self.isSameProcess){
+        self.loupeEnabled = loupeSwitchState();
+        UIImage *image = [UIImage systemImageNamed:self.loupeEnabled?@"magnifyingglass.circle.fill":@"magnifyingglass.circle"];
+        self.loupeButton.image = image;
+    }
+    self.asyncUpdated = NO;
+    self.isSameProcess = NO;
 }
 
 -(void)defineAction:(UIBarButtonItem*)sender{
@@ -3424,6 +3500,10 @@ static void updateAutoCapitalization() {
     [[NSNotificationCenter defaultCenter] postNotificationName:@"updateAutoCapitalization" object:nil];
 }
 
+static void updateLoupe() {
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"updateLoupe" object:nil];
+}
+
 static void reloadPrefs() {
     
     toastTintColor = toastImageTintColor;
@@ -3455,8 +3535,8 @@ static void reloadPrefs() {
 
                 NSKeyedUnarchiver *unarchiver = [[NSKeyedUnarchiver alloc] initForReadingFromData:prefs[kCachekey] error:nil];
                 unarchiver.requiresSecureCoding = NO;
-                int cacheDylibSum = [[unarchiver decodeObjectForKey:@"copyLogDylibExist"] intValue] + [[unarchiver decodeObjectForKey:@"translomaticDylibExist"] intValue] + [[unarchiver decodeObjectForKey:@"wasabiDylibExist"] intValue] + [[unarchiver decodeObjectForKey:@"pasitheaDylibExist"] intValue] + [[unarchiver decodeObjectForKey:@"copypastaDylibExist"] intValue];
-                int actualDylibSum = [@(shortcutsGenerator.copyLogDylibExist) intValue] + [@(shortcutsGenerator.translomaticDylibExist) intValue] + [@(shortcutsGenerator.wasabiDylibExist) intValue] + [@(shortcutsGenerator.pasitheaDylibExist) intValue] + [@(shortcutsGenerator.copypastaDylibExist) intValue];
+                int cacheDylibSum = [[unarchiver decodeObjectForKey:@"copyLogDylibExist"] intValue] + [[unarchiver decodeObjectForKey:@"translomaticDylibExist"] intValue] + [[unarchiver decodeObjectForKey:@"wasabiDylibExist"] intValue] + [[unarchiver decodeObjectForKey:@"pasitheaDylibExist"] intValue] + [[unarchiver decodeObjectForKey:@"copypastaDylibExist"] intValue] + [[unarchiver decodeObjectForKey:@"loupeDylibExist"] intValue];
+                int actualDylibSum = [@(shortcutsGenerator.copyLogDylibExist) intValue] + [@(shortcutsGenerator.translomaticDylibExist) intValue] + [@(shortcutsGenerator.wasabiDylibExist) intValue] + [@(shortcutsGenerator.pasitheaDylibExist) intValue] + [@(shortcutsGenerator.copypastaDylibExist) intValue] + [@(shortcutsGenerator.loupeDylibExist) intValue];
                 [unarchiver finishDecoding];
 
                 //NSLog(@"XPAD cache: %d ** actual: %d", cacheDylibSum, actualDylibSum);
@@ -3505,6 +3585,7 @@ static void reloadPrefs() {
                     CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(), NULL, (CFNotificationCallback)reloadPrefs, (CFStringRef)kPrefsChangedIdentifier, NULL, CFNotificationSuspensionBehaviorDeliverImmediately);
                     CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(), NULL, (CFNotificationCallback)updateAutoCorrection, (CFStringRef)kAutoCorrectionChangedIdentifier, NULL, CFNotificationSuspensionBehaviorDeliverImmediately);
                     CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(), NULL, (CFNotificationCallback)updateAutoCapitalization, (CFStringRef)kAutoCapitalizationChangedIdentifier, NULL, CFNotificationSuspensionBehaviorDeliverImmediately);
+                    CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(), NULL, (CFNotificationCallback)updateLoupe, (CFStringRef)kLoupeChangedIdentifier, NULL, CFNotificationSuspensionBehaviorDeliverImmediately);
                     
                 }
                 
