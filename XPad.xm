@@ -2034,6 +2034,9 @@ NSString *preferencesSelectorForIdentifier(NSString* identifier, int selectorNum
     if (!self.shortcutsGenerator.loupeDylibExist){
         return;
     }
+    if (!dlsym(RTLD_DEFAULT, "flipLoupeEnableSwitch") || !dlsym(RTLD_DEFAULT, "flipLoupeEnableSwitch")){
+        return;
+    }
     self.loupeEnabled = loupeSwitchState();
     flipLoupeEnableSwitch(!self.loupeEnabled);
     self.isSameProcess = YES;
@@ -2250,8 +2253,11 @@ NSString *preferencesSelectorForIdentifier(NSString* identifier, int selectorNum
 
 -(void)copypastaAction:(UIBarButtonItem*)sender{
     if (!self.shortcutsGenerator.pasitheaDylibExist){
-           return;
-       }
+        return;
+    }
+    if (!dlsym(RTLD_DEFAULT, "showCopypastaWithNotification")){
+        return;
+    }
     [self triggerImpactAndAnimationWithButton:sender selectorName:NSStringFromSelector(_cmd) toastWidthOffset:0 toastHeightOffset:0];
     showCopypastaWithNotification();
 }
