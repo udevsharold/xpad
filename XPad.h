@@ -14,6 +14,11 @@ BOOL loupeSwitchState() __attribute__((weak));
 }
 #endif
 
+@interface UIApplication ()
+- (UIDeviceOrientation)_frontMostAppOrientation;
+@end
+
+
 @interface UIKeyboardExtensionInputMode : UITextInputMode
 -(BOOL)isDefaultRightToLeft;
 @end
@@ -125,6 +130,7 @@ BOOL loupeSwitchState() __attribute__((weak));
 
 
 @interface UITextInputAssistantItem  (XPad)
+@property (setter=_setDetachedTintColor:,getter=_detachedTintColor,nonatomic,retain) UIColor * detachedTintColor;
 @property (nonatomic,copy) NSArray * leadingBarButtonGroups;
 @end
 
@@ -136,8 +142,12 @@ BOOL loupeSwitchState() __attribute__((weak));
 @property (nonatomic,retain) NSArray  *buttonGroups;
 @end
 
+@interface TUIPredictionView : UIView
+@end
+
 @interface TUISystemInputAssistantView : UIView
 @property (nonatomic,retain) TUIAssistantButtonBarView * leftButtonBar;
+@property (nonatomic,retain) TUIAssistantButtonBarView * unifiedButtonBar;
 @property (nonatomic,readonly) id  predictionView;
 @property (nonatomic,retain) UIView * centerView;
 @property (assign,nonatomic) BOOL centerViewHidden;
@@ -148,9 +158,13 @@ BOOL loupeSwitchState() __attribute__((weak));
 @property (nonatomic,strong) TUISystemInputAssistantView *xpadAssistantView;
 @property (nonatomic, strong) UIBarButtonItemGroup *XPadShortcutsGroup;
 @property (nonatomic, strong) UIBarButtonItemGroup *XPadShortcutsBundleGroup;
+@property (nonatomic, strong) UIBarButtonItemGroup *XPadShortcutsFloatGroup;
+@property (nonatomic, strong) UIBarButtonItemGroup *XPadShortcutsBundleFloatGroup;
 @property (nonatomic, strong) UIBarButtonItem *bundleButton;
 @property (nonatomic, strong) NSMutableArray *XPadShortcuts;
 @property (nonatomic, strong) NSMutableArray *XPadShortcutsBundle;
+@property (nonatomic, strong) NSMutableArray *XPadShortcutsFloat;
+@property (nonatomic, strong) NSMutableArray *XPadShortcutsBundleFloat;
 @property (strong, nonatomic) NSMutableArray *kbType;
 @property (strong, nonatomic) NSMutableArray *kbTypeLabel;
 @property (nonatomic, assign) NSInteger trueKBType;
@@ -313,8 +327,7 @@ BOOL loupeSwitchState() __attribute__((weak));
 @property (assign,nonatomic) UITextInputAssistantItem * observedInputAssistantItem;
 @property (nonatomic,readonly) TUISystemInputAssistantView * systemInputAssistantView;
 -(id)_defaultTintColor;
-@property (nonatomic, retain) XPad *xpad;
--(void)installGesturesForButtonGroupIndex:(NSInteger)groupindex assistantView:(TUISystemInputAssistantView *)assistantView popOver:(BOOL)popOver;
+-(void)installGesturesForButtonGroupIndex:(NSInteger)groupindex groups:(NSArray <UIBarButtonItemGroup *> *)groups popOver:(BOOL)popOver;
 
 @end
 
@@ -323,8 +336,29 @@ BOOL loupeSwitchState() __attribute__((weak));
 +(void)initialize;
 @end
 
-@interface UIKeyboardImpl : UIView
+
+@interface _UIKBRTKeyboardTouchObserver : NSObject
+@property (nonatomic,retain) NSMutableDictionary * touches;
+@end
+
+@interface _UIKBRTFingerDetection : _UIKBRTKeyboardTouchObserver
+@end
+
+@interface UIKeyboardLayout : UIView
+@property (nonatomic,retain) _UIKBRTFingerDetection * fingerDetection;
+@property (nonatomic,readonly) long long orientation;
+@end
+
+@interface UIKeyboardImpl : UIView{
+    UIKeyboardLayout* m_layout;
+}
++(UIWindow *)keyboardWindow;
++(CGPoint)floatingNormalizedPersistentOffset;
++(CGPoint)floatingPersistentOffset;
 + (UIKeyboardImpl*)activeInstance;
++(CGPoint)_screenPointFromNormalizedPoint:(CGPoint)arg1 ;
++(CGPoint)normalizedPersistentOffset;
++(id)keyboardScreen;
 +(BOOL)isFloating;
 - (BOOL)isLongPress;
 - (void)handleDelete;
@@ -523,4 +557,10 @@ typedef enum PSCellType {
 -(void)switchToDictationInputModeWithTouch:(id)arg1 withKeyboardInputMode:(id)arg2 ;
 -(void)setDictationInputMode:(id)arg1 ;
 -(void)stopDictation:(BOOL)arg1;
+@end
+
+@interface UISystemDefaultTextInputAssistantItem : UITextInputAssistantItem
+@property (assign,getter=_isSystemItem,nonatomic) BOOL systemItem;
+@property (nonatomic,retain) NSArray * defaultSystemLeadingBarButtonGroups;
+@property (nonatomic,retain) NSArray * defaultSystemTrailingBarButtonGroups;
 @end

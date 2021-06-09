@@ -31,6 +31,7 @@
 #define kColorEnabledkey @"colorBOOL"
 #define kModekey @"mode"
 #define kMaxVisiblekey @"maxvisible"
+#define kMaxVisibleFloatkey @"maxvisiblefloat"
 #define kCollapseCopyLogkey @"collapsecopylogBOOL"
 #define kDisplayTypekey @"displaytype"
 #define kCustomActionskey @"customactions"
@@ -67,6 +68,7 @@
 #define maxShortcuts 8
 #define maxdefaultshortcuts 5
 #define maxBeforeBundle 4
+#define maxBeforeBundleFloat 3
 
 #define maxdefaultshortcutskbtype 3
 

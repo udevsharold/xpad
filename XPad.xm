@@ -179,7 +179,7 @@ NSString *preferencesSelectorForIdentifier(NSString* identifier, int selectorNum
 - (instancetype)init{
     if (self = [super init]){
         self.shortcutsGenerator = [ShortcutsGenerator sharedInstance];
-
+        
         if (!prefs){
             prefs = [NSMutableDictionary dictionaryWithContentsOfFile:kPrefsPath];
         }
@@ -192,9 +192,13 @@ NSString *preferencesSelectorForIdentifier(NSString* identifier, int selectorNum
             unarchiver.requiresSecureCoding = NO;
             self.XPadShortcuts = [unarchiver decodeObjectForKey:@"XPadShortcuts"];
             self.XPadShortcutsBundle = [unarchiver decodeObjectForKey:@"XPadShortcutsBundle"];
+            self.XPadShortcutsFloat = [unarchiver decodeObjectForKey:@"XPadShortcutsFloat"];
+            self.XPadShortcutsBundleFloat = [unarchiver decodeObjectForKey:@"XPadShortcutsBundleFloat"];
             self.XPadShortcutsDetails = [unarchiver decodeObjectForKey:@"XPadShortcutsDetails"];
             self.XPadShortcutsGroup = [unarchiver decodeObjectForKey:@"XPadShortcutsGroup"];
             self.XPadShortcutsBundleGroup = [unarchiver decodeObjectForKey:@"XPadShortcutsBundleGroup"];
+            self.XPadShortcutsFloatGroup = [unarchiver decodeObjectForKey:@"XPadShortcutsFloatGroup"];
+            self.XPadShortcutsBundleFloatGroup = [unarchiver decodeObjectForKey:@"XPadShortcutsBundleFloatGroup"];
             self.kbType = [unarchiver decodeObjectForKey:@"kbType"];
             self.kbTypeLabel = [unarchiver decodeObjectForKey:@"kbTypeLabel"];
             self.autoCorrectionButton = [unarchiver decodeObjectForKey:@"autoCorrectionButton"];
@@ -204,25 +208,27 @@ NSString *preferencesSelectorForIdentifier(NSString* identifier, int selectorNum
                 self.loupeButton = [unarchiver decodeObjectForKey:@"loupeButton"];
             }
             [unarchiver finishDecoding];
-            
             NSArray *tagsShortcuts = [self.XPadShortcuts valueForKey:@"tag"];
             NSArray *tagsShortcutsBundle = [self.XPadShortcutsBundle valueForKey:@"tag"];
-            
+            NSArray *tagsShortcutsFloat = [self.XPadShortcutsFloat valueForKey:@"tag"];
+            NSArray *tagsShortcutsBundleFloat = [self.XPadShortcutsBundleFloat valueForKey:@"tag"];
             
             [self.XPadShortcuts setValue:self forKey:@"target"];
             [self.XPadShortcutsBundle setValue:self forKey:@"target"];
+            [self.XPadShortcutsFloat setValue:self forKey:@"target"];
+            [self.XPadShortcutsBundleFloat setValue:self forKey:@"target"];
             
-            if ([tagsShortcuts containsObject:@100] || [tagsShortcutsBundle containsObject:@100]){
+            if ([tagsShortcuts containsObject:@100] || [tagsShortcutsBundle containsObject:@100] || [tagsShortcutsFloat containsObject:@100] || [tagsShortcutsBundleFloat containsObject:@100]){
                 [self updateAutoCorrectionButton];
             }
-            if ([tagsShortcuts containsObject:@101] || [tagsShortcutsBundle containsObject:@101]){
+            if ([tagsShortcuts containsObject:@101] || [tagsShortcutsBundle containsObject:@101] || [tagsShortcutsFloat containsObject:@101] || [tagsShortcutsBundleFloat containsObject:@101]){
                 [self updateAutoCapitalizationButton];
             }
-            if ([tagsShortcuts containsObject:@102] || [tagsShortcutsBundle containsObject:@102]){
+            if ([tagsShortcuts containsObject:@102] || [tagsShortcutsBundle containsObject:@102] || [tagsShortcutsFloat containsObject:@102] || [tagsShortcutsBundleFloat containsObject:@102]){
                 [self updateKeyboardTypeButton];
             }
             if (self.shortcutsGenerator.loupeDylibExist){
-                if ([tagsShortcuts containsObject:@103] || [tagsShortcutsBundle containsObject:@103]){
+                if ([tagsShortcuts containsObject:@103] || [tagsShortcutsBundle containsObject:@103] || [tagsShortcutsFloat containsObject:@103] || [tagsShortcutsBundleFloat containsObject:@103]){
                     [self updateLoupeButton];
                 }
             }
@@ -230,12 +236,13 @@ NSString *preferencesSelectorForIdentifier(NSString* identifier, int selectorNum
             //NSLog(@"XPAD Utilized cache");
         }else{
             //NSLog(@"XPAD update cache");
-
-
+            
+            
             
             self.XPadShortcuts = [[NSMutableArray alloc] init];
             self.XPadShortcutsBundle = [[NSMutableArray alloc] init];
-            
+            self.XPadShortcutsFloat = [[NSMutableArray alloc] init];
+            self.XPadShortcutsBundleFloat = [[NSMutableArray alloc] init];
             //self.setLongPressGesture = YES;
             
             
@@ -273,6 +280,8 @@ NSString *preferencesSelectorForIdentifier(NSString* identifier, int selectorNum
                     }
                     
                     UIBarButtonItem *shortcutButton = [[UIBarButtonItem alloc] initWithImage:[XPadHelper imageForName:item[@"images"] withSystemColor:NO completion:nil] style:UIBarButtonItemStylePlain target:self action:NSSelectorFromString(selectorName)];
+                    UIBarButtonItem *shortcutButtonFloat = [[UIBarButtonItem alloc] initWithImage:[XPadHelper imageForName:item[@"images"] withSystemColor:NO completion:nil] style:UIBarButtonItemStylePlain target:self action:NSSelectorFromString(selectorName)];
+                    
                     shortcutButton.tintColor = currentTintColor;
                     if ([selectorName isEqualToString:@"autoCorrectionAction:"]){
                         shortcutButton.tag = 100;
@@ -295,6 +304,11 @@ NSString *preferencesSelectorForIdentifier(NSString* identifier, int selectorNum
                         [self.XPadShortcuts addObject:shortcutButton];
                     }else{
                         [self.XPadShortcutsBundle addObject:shortcutButton];
+                    }
+                    if (i < preferencesInt(kMaxVisibleFloatkey, maxBeforeBundleFloat)){
+                        [self.XPadShortcutsFloat addObject:shortcutButtonFloat];
+                    }else{
+                        [self.XPadShortcutsBundleFloat addObject:shortcutButtonFloat];
                     }
                     i++;
                     //}
@@ -304,6 +318,8 @@ NSString *preferencesSelectorForIdentifier(NSString* identifier, int selectorNum
                     //if (@available(iOS 13.0, *)){
                     NSString *selectorName = shortcutsSelectorNameDefault[i];
                     UIBarButtonItem *shortcutButton = [[UIBarButtonItem alloc] initWithImage:[UIImage systemImageNamed:shortcutsImageNameDefault[i]] style:UIBarButtonItemStylePlain target:self action:NSSelectorFromString(selectorName)];
+                    UIBarButtonItem *shortcutButtonFloat = [[UIBarButtonItem alloc] initWithImage:[UIImage systemImageNamed:shortcutsImageNameDefault[i]] style:UIBarButtonItemStylePlain target:self action:NSSelectorFromString(selectorName)];
+                    
                     shortcutButton.tintColor = currentTintColor;
                     if ([selectorName isEqualToString:@"autoCorrectionAction:"]){
                         shortcutButton.tag = 100;
@@ -327,12 +343,19 @@ NSString *preferencesSelectorForIdentifier(NSString* identifier, int selectorNum
                     }else{
                         [self.XPadShortcutsBundle addObject:shortcutButton];
                     }
+                    if (i < preferencesInt(kMaxVisibleFloatkey, maxBeforeBundleFloat)){
+                        [self.XPadShortcutsFloat addObject:shortcutButtonFloat];
+                    }else{
+                        [self.XPadShortcutsBundleFloat addObject:shortcutButtonFloat];
+                    }
                     //}
                 }
             }
             self.XPadShortcutsDetails = @[shortcutsImageNameDefault,shortcutsSelectorNameDefault,shortcutsLPSelectorNameDefault];
             self.XPadShortcutsGroup = [[UIBarButtonItemGroup alloc]
                                        initWithBarButtonItems:self.XPadShortcuts representativeItem:nil];
+            self.XPadShortcutsFloatGroup = [[UIBarButtonItemGroup alloc]
+                                            initWithBarButtonItems:self.XPadShortcutsFloat representativeItem:nil];
             
             NSArray *kbTypeData = [self.shortcutsGenerator keyboardTypeData];
             NSArray *kbTypeLabel = [self.shortcutsGenerator keyboardTypeLabel];
@@ -364,6 +387,13 @@ NSString *preferencesSelectorForIdentifier(NSString* identifier, int selectorNum
                                                  initWithBarButtonItems:self.XPadShortcutsBundle representativeItem:self.bundleButton];
             }
             
+            if ([self.XPadShortcutsBundleFloat count] > 0){
+                if (!self.bundleButton){
+                    self.bundleButton = [[UIBarButtonItem alloc] initWithImage:[UIImage systemImageNamed:@"ellipsis.circle"] style:UIBarButtonItemStylePlain target:nil action:nil];
+                }
+                self.XPadShortcutsBundleFloatGroup = [[UIBarButtonItemGroup alloc]
+                                                      initWithBarButtonItems:self.XPadShortcutsBundleFloat representativeItem:self.bundleButton];
+            }
             
             dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
                 PrefsManager *prefsManager = [PrefsManager sharedInstance];
@@ -373,23 +403,27 @@ NSString *preferencesSelectorForIdentifier(NSString* identifier, int selectorNum
                 NSKeyedArchiver *archiver = [[NSKeyedArchiver alloc] initRequiringSecureCoding:NO];
                 [archiver encodeObject:self.XPadShortcuts forKey:@"XPadShortcuts"];
                 [archiver encodeObject:self.XPadShortcutsBundle forKey:@"XPadShortcutsBundle"];
+                [archiver encodeObject:self.XPadShortcutsFloat forKey:@"XPadShortcutsFloat"];
+                [archiver encodeObject:self.XPadShortcutsBundleFloat forKey:@"XPadShortcutsBundleFloat"];
                 [archiver encodeObject:self.XPadShortcutsDetails forKey:@"XPadShortcutsDetails"];
                 [archiver encodeObject:self.XPadShortcutsGroup forKey:@"XPadShortcutsGroup"];
                 [archiver encodeObject:self.XPadShortcutsBundleGroup forKey:@"XPadShortcutsBundleGroup"];
+                [archiver encodeObject:self.XPadShortcutsFloatGroup forKey:@"XPadShortcutsFloatGroup"];
+                [archiver encodeObject:self.XPadShortcutsBundleFloatGroup forKey:@"XPadShortcutsBundleFloatGroup"];
                 [archiver encodeObject:self.kbType forKey:@"kbType"];
                 [archiver encodeObject:self.kbTypeLabel forKey:@"kbTypeLabel"];
                 [archiver encodeObject:self.autoCorrectionButton forKey:@"autoCorrectionButton"];
                 [archiver encodeObject:self.autoCapitalizationButton forKey:@"autoCapitalizationButton"];
                 [archiver encodeObject:self.keyboardInputTypeButton forKey:@"keyboardInputTypeButton"];
                 [archiver encodeObject:self.loupeButton forKey:@"loupeButton"];
-
+                
                 [archiver encodeObject:@(self.shortcutsGenerator.copyLogDylibExist) forKey:@"copyLogDylibExist"];
                 [archiver encodeObject:@(self.shortcutsGenerator.translomaticDylibExist) forKey:@"translomaticDylibExist"];
                 [archiver encodeObject:@(self.shortcutsGenerator.wasabiDylibExist) forKey:@"wasabiDylibExist"];
                 [archiver encodeObject:@(self.shortcutsGenerator.pasitheaDylibExist) forKey:@"pasitheaDylibExist"];
                 [archiver encodeObject:@(self.shortcutsGenerator.copypastaDylibExist) forKey:@"copypastaDylibExist"];
                 [archiver encodeObject:@(self.shortcutsGenerator.loupeDylibExist) forKey:@"loupeDylibExist"];
-
+                
                 [archiver finishEncoding];
                 //NSLog(@"XPAD: %@", error);
                 
@@ -415,7 +449,7 @@ NSString *preferencesSelectorForIdentifier(NSString* identifier, int selectorNum
                  */
                 [prefsManager setValue:archiver.encodedData forKey:kCachekey fromSandbox:!isSpringBoard];
                 prefs = [[prefsManager readPrefsFromSandbox:!isSpringBoard] mutableCopy];
-
+                
                 
                 //NSLog(@"XPAD: Cache updated");
             });
@@ -446,7 +480,7 @@ NSString *preferencesSelectorForIdentifier(NSString* identifier, int selectorNum
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateAutoCorrection:) name:@"updateAutoCorrection" object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateAutoCapitalization:) name:@"updateAutoCapitalization" object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateLoupe:) name:@"updateLoupe" object:nil];
-
+        
         //NSData *data = [NSKeyedArchiver
         //archivedDataWithRootObject:self requiringSecureCoding:NO error:&error];
         //NSLog(@"XPAD: %@", error);
@@ -843,6 +877,7 @@ NSString *preferencesSelectorForIdentifier(NSString* identifier, int selectorNum
         }
     }
     //HBLogDebug(@"W: %f, H: %f, X: %f, Y: %f", kScreenW, kScreenH, autoPositionX, autoPositionY);
+    
     return @{@"X":[NSNumber numberWithFloat:autoPositionX], @"Y":[NSNumber numberWithFloat:autoPositionY]};
 }
 
@@ -1074,7 +1109,9 @@ NSString *preferencesSelectorForIdentifier(NSString* identifier, int selectorNum
         
         NSDictionary *locationForModeData = [self locationForMode:prefs[kModekey]?[prefs[kModekey] intValue]:0 assistantView:self.systemInputAssistantView actionName:selname];
         
-        [self sendShowToastRequestWithMessage:actionName imagePath:[self getImageNameForActionName:selname] imageTint:toastTintColor width:tw+woffset height:th+hoffset positionX:[locationForModeData[@"X"] floatValue] positionY:[locationForModeData[@"Y"] floatValue] duration:preferencesFloat(kToastDurationkey, toastDuration) alpha:toastAlpha radius:toastRadius textColor:toastTextColor backgroundColor:toastBackgroundTintColor displayType:preferencesInt(kDisplayTypekey, 0)];
+        if (![%c(UIKeyboardImpl) isFloating]){
+            [self sendShowToastRequestWithMessage:actionName imagePath:[self getImageNameForActionName:selname] imageTint:toastTintColor width:tw+woffset height:th+hoffset positionX:[locationForModeData[@"X"] floatValue] positionY:[locationForModeData[@"Y"] floatValue] duration:preferencesFloat(kToastDurationkey, toastDuration) alpha:toastAlpha radius:toastRadius textColor:toastTextColor backgroundColor:toastBackgroundTintColor displayType:preferencesInt(kDisplayTypekey, 0)];
+        }
     }
     [self shakeButton:sender];
 }
@@ -1476,14 +1513,14 @@ NSString *preferencesSelectorForIdentifier(NSString* identifier, int selectorNum
     [self selectAllAction:nil];
     
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(secondActionDelay * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-
-    [self triggerImpactAndAnimationWithButton:sender selectorName:@"deleteAction:" toastWidthOffset:10 toastHeightOffset:0];
-    kbImpl = [%c(UIKeyboardImpl) activeInstance];
-    delegate = kbImpl.privateInputDelegate ?: kbImpl.inputDelegate;
-    [kbImpl deleteFromInput];
-    [kbImpl clearTransientState];
-    [kbImpl clearAnimations];
-    [kbImpl setCaretBlinks:YES];
+        
+        [self triggerImpactAndAnimationWithButton:sender selectorName:@"deleteAction:" toastWidthOffset:10 toastHeightOffset:0];
+        kbImpl = [%c(UIKeyboardImpl) activeInstance];
+        delegate = kbImpl.privateInputDelegate ?: kbImpl.inputDelegate;
+        [kbImpl deleteFromInput];
+        [kbImpl clearTransientState];
+        [kbImpl clearAnimations];
+        [kbImpl setCaretBlinks:YES];
     });
     
 }
@@ -2047,7 +2084,7 @@ NSString *preferencesSelectorForIdentifier(NSString* identifier, int selectorNum
     UIImage *image;
     image = [UIImage systemImageNamed:(!self.loupeEnabled?@"magnifyingglass.circle.fill":@"magnifyingglass.circle")];
     sender.image = image;
-
+    
     CFNotificationCenterPostNotification(CFNotificationCenterGetDarwinNotifyCenter(), (CFStringRef)kLoupeChangedIdentifier, NULL, NULL, YES);
 }
 
@@ -2234,8 +2271,8 @@ NSString *preferencesSelectorForIdentifier(NSString* identifier, int selectorNum
 
 -(void)wasabiAction:(UIBarButtonItem *)sender{
     if (!self.shortcutsGenerator.wasabiDylibExist){
-           return;
-       }
+        return;
+    }
     UIKeyboardInputModeController *inputModeController = [objc_getClass("UIKeyboardInputModeController") sharedInputModeController];
     NSPredicate *resultPredicate = [NSPredicate
                                     predicateWithFormat:@"SELF.identifier contains[cd] %@",
@@ -2245,8 +2282,8 @@ NSString *preferencesSelectorForIdentifier(NSString* identifier, int selectorNum
 
 -(void)pasitheaAction:(UIBarButtonItem*)sender{
     if (!self.shortcutsGenerator.pasitheaDylibExist){
-           return;
-       }
+        return;
+    }
     [self triggerImpactAndAnimationWithButton:sender selectorName:NSStringFromSelector(_cmd) toastWidthOffset:0 toastHeightOffset:0];
     CFNotificationCenterPostNotification(CFNotificationCenterGetDarwinNotifyCenter(), (CFStringRef)kPasitheaOpenVewIdentifier, NULL, NULL, YES);
 }
@@ -3292,156 +3329,176 @@ NSString *preferencesSelectorForIdentifier(NSString* identifier, int selectorNum
 @end
 
 
-%group XPad
+%group XPAD_GROUP
+static XPad *xpad;
+
+%hook UIAssistantBarButtonItemProvider
++(UISystemDefaultTextInputAssistantItem *)systemDefaultAssistantItem{
+    UISystemDefaultTextInputAssistantItem *defaultAssistantItem = %orig;
+    if ([xpad.XPadShortcutsBundleFloat count] > 0 && xpad.XPadShortcutsFloatGroup && xpad.XPadShortcutsBundleFloatGroup){
+        defaultAssistantItem.leadingBarButtonGroups = @[xpad.XPadShortcutsFloatGroup, xpad.XPadShortcutsBundleFloatGroup];
+    }else if (xpad.XPadShortcutsFloatGroup){
+        defaultAssistantItem.leadingBarButtonGroups = @[xpad.XPadShortcutsFloatGroup];
+    }
+    
+    if (xpad.keyboardInputTypeButton){
+        kbImpl = [%c(UIKeyboardImpl) activeInstance];
+        delegate = kbImpl.privateInputDelegate ?: kbImpl.inputDelegate;
+        xpad.keyboardInputTypeButton.image = [XPadHelper imageForName:[delegate respondsToSelector:@selector(keyboardType)]?@"number.circle.fill":@"number.circle" withSystemColor:NO completion:nil];
+    }
+    return defaultAssistantItem;
+}
+%end
 
 %hook UISystemInputAssistantViewController
-%property (nonatomic, retain) XPad *xpad;
+-(BOOL)_shouldShowExpandableButtonBarItemsForResponder:(id)arg1{
+    return [%c(UIKeyboardImpl) isFloating] ?: %orig;
+}
 
 -(id)init{
     self = %orig;
-    self.xpad = [[XPad alloc] init];
-    self.xpad.systemInputAssistantView = self.systemInputAssistantView;
+    xpad = [[XPad alloc] init];
+    xpad.systemInputAssistantView = self.systemInputAssistantView;
     
     dispatch_async(dispatch_get_main_queue(), ^{
         kbImpl = [%c(UIKeyboardImpl) activeInstance];
         delegate = kbImpl.privateInputDelegate ?: kbImpl.inputDelegate;
         if ([delegate respondsToSelector:@selector(keyboardType)]){
             if (shouldUpdateTrueKBType){
-                self.xpad.trueKBType = [[NSNumber numberWithInt:[delegate keyboardType]] intValue];
+                xpad.trueKBType = [[NSNumber numberWithInt:[delegate keyboardType]] intValue];
                 shouldUpdateTrueKBType = NO;
             }
-            NSUInteger index = [self.xpad.kbType indexOfObject:[NSNumber numberWithInt:[delegate keyboardType]]];
+            NSUInteger index = [xpad.kbType indexOfObject:[NSNumber numberWithInt:[delegate keyboardType]]];
             HBLogDebug(@"indexXXXXX: %lu", index);
             if (index == NSNotFound){
                 HBLogDebug(@"INDEXOF: %@", [NSNumber numberWithInt:[delegate keyboardType]]);
                 //ShortcutsGenerator *shortcutsGenerator = [ShortcutsGenerator sharedInstance];
                 
-                NSArray *kbTypeData = [self.xpad.shortcutsGenerator keyboardTypeData];
-                NSArray *kbTypeLabel = [self.xpad.shortcutsGenerator keyboardTypeLabel];
+                NSArray *kbTypeData = [xpad.shortcutsGenerator keyboardTypeData];
+                NSArray *kbTypeLabel = [xpad.shortcutsGenerator keyboardTypeLabel];
                 
                 NSUInteger indexInArray = [kbTypeData indexOfObject:[NSNumber numberWithInt:[delegate keyboardType]]];
                 if (index == NSNotFound){
                     if ([delegate keyboardType] > 12){
-                        self.xpad.trueKBType = 0;
+                        xpad.trueKBType = 0;
                         shouldUpdateTrueKBType = NO;
                     }else{
-                        [self.xpad.kbType insertObject:[NSNumber numberWithInt:[delegate keyboardType]] atIndex:0];
+                        [xpad.kbType insertObject:[NSNumber numberWithInt:[delegate keyboardType]] atIndex:0];
                         if (indexInArray != NSNotFound){
-                            [self.xpad.kbTypeLabel insertObject:kbTypeLabel[indexInArray] atIndex:0];
+                            [xpad.kbTypeLabel insertObject:kbTypeLabel[indexInArray] atIndex:0];
                         }else{
-                            [self.xpad.kbTypeLabel insertObject:@"Generic" atIndex:0];
+                            [xpad.kbTypeLabel insertObject:@"Generic" atIndex:0];
                         }
                     }
                 }else{
-                    [self.xpad.kbType insertObject:kbTypeData[indexInArray] atIndex:0];
-                    [self.xpad.kbTypeLabel insertObject:kbTypeLabel[indexInArray] atIndex:0];
+                    [xpad.kbType insertObject:kbTypeData[indexInArray] atIndex:0];
+                    [xpad.kbTypeLabel insertObject:kbTypeLabel[indexInArray] atIndex:0];
                 }
                 
             }else{
-                self.xpad.trueKBType = 0;
+                xpad.trueKBType = 0;
                 shouldUpdateTrueKBType = NO;
             }
         }else{
             UIImage *image;
             image = [UIImage systemImageNamed:[delegate respondsToSelector:@selector(keyboardType)]?@"number.circle.fill":@"number.circle"];
-            self.xpad.keyboardInputTypeButton.image = image;
+            xpad.keyboardInputTypeButton.image = image;
         }
     });
     return systemAssistantController = self;
 }
 
 %new
--(void)installGesturesForButtonGroupIndex:(NSInteger)groupindex assistantView:(TUISystemInputAssistantView *)assistantView popOver:(BOOL)popOver{
+-(void)installGesturesForButtonGroupIndex:(NSInteger)groupindex groups:(NSArray <UIBarButtonItemGroup *> *)groups popOver:(BOOL)popOver{
     int checkedCount = 0;
     int expectedCount = 1;
-    NSArray <UIBarButtonItemGroup *>*groups = assistantView.leftButtonBar.buttonGroups;
     if ([groups count]-1 < groupindex) return;
     
     if (doubleTapEnabled) expectedCount += 1;
+    
+    for (UIBarButtonItem *btn in groups[groupindex].items){
+        UIView *btnView = (UIView *)[btn valueForKey:@"view"];
+        BOOL isLPAdded = NO;
+        BOOL isDTAdded = NO;
+        //BOOL isSTAdded = NO;
         
-        for (UIBarButtonItem *btn in groups[groupindex].items){
-            UIView *btnView = (UIView *)[btn valueForKey:@"view"];
-            BOOL isLPAdded = NO;
-            BOOL isDTAdded = NO;
-            //BOOL isSTAdded = NO;
-            
-            //if (@available(iOS 13.0, *)){
-            
-            for (UIGestureRecognizer *recognizer in btnView.gestureRecognizers) {
-                if ([recognizer.name containsString:@"XPad-LP-"]){
-                    isLPAdded = YES;
-                    checkedCount += 1;
-                    if (checkedCount >= expectedCount) break;
-                }
-                /*
-                 if ([recognizer.name containsString:@"XPad-ST-"]){
-                 isSTAdded = YES;
-                 checkedCount += 1;
-                 if (checkedCount >= expectedCount) break;
-                 }
-                 */
-                if ([recognizer.name containsString:@"XPad-DT-"]){
-                    isDTAdded = YES;
-                    checkedCount += 1;
-                    if (checkedCount >= expectedCount) break;
-                }
-            }
-            
-            if (!isLPAdded){
-                HBLogDebug(@"Added gesture");
-                UILongPressGestureRecognizer *longPress = [[UILongPressGestureRecognizer alloc] initWithTarget:self.xpad action:@selector(activateLPActions:)];
-                longPress.minimumPressDuration = 0.5;
-                NSString *gestureIdentifier = [NSString stringWithFormat:@"XPad-LP-%@",NSStringFromSelector([btn action])];
-                longPress.name = gestureIdentifier;
-                [btnView addGestureRecognizer:longPress];
-            }
-            
-            //UIShortTapGestureRecognizer *singleTap;
-            UIShortTapGestureRecognizer *doubleTap;
-            
-            if (doubleTapEnabled && !isDTAdded && !popOver){
-                HBLogDebug(@"Added gesture");
-                doubleTap = [[UIShortTapGestureRecognizer alloc] initWithTarget:self.xpad action:@selector(activateDTActions:)];
-                doubleTap.numberOfTapsRequired = 2;
-                NSString *gestureIdentifier = [NSString stringWithFormat:@"XPad-DT-%@",NSStringFromSelector([btn action])];
-                doubleTap.name = gestureIdentifier;
-                [btnView addGestureRecognizer:doubleTap];
+        //if (@available(iOS 13.0, *)){
+        
+        for (UIGestureRecognizer *recognizer in btnView.gestureRecognizers) {
+            if ([recognizer.name containsString:@"XPad-LP-"]){
+                isLPAdded = YES;
+                checkedCount += 1;
+                if (checkedCount >= expectedCount) break;
             }
             /*
-             if (doubleTapEnabled && !isSTAdded){
-             HBLogDebug(@"Added gesture");
-             singleTap = [[UIShortTapGestureRecognizer alloc] initWithTarget:self.xpad action:btn.action];
-             singleTap.numberOfTapsRequired = 1;
-             NSString *gestureIdentifier = [NSString stringWithFormat:@"XPad-ST-%@",NSStringFromSelector([btn action])];
-             singleTap.name = gestureIdentifier;
-             [singleTap requireGestureRecognizerToFail:doubleTap];
-             [btnView addGestureRecognizer:singleTap];
-             
+             if ([recognizer.name containsString:@"XPad-ST-"]){
+             isSTAdded = YES;
+             checkedCount += 1;
+             if (checkedCount >= expectedCount) break;
              }
              */
-            
+            if ([recognizer.name containsString:@"XPad-DT-"]){
+                isDTAdded = YES;
+                checkedCount += 1;
+                if (checkedCount >= expectedCount) break;
+            }
         }
+        
+        if (!isLPAdded){
+            HBLogDebug(@"Added gesture");
+            UILongPressGestureRecognizer *longPress = [[UILongPressGestureRecognizer alloc] initWithTarget:xpad action:@selector(activateLPActions:)];
+            longPress.minimumPressDuration = 0.5;
+            NSString *gestureIdentifier = [NSString stringWithFormat:@"XPad-LP-%@",NSStringFromSelector([btn action])];
+            longPress.name = gestureIdentifier;
+            [btnView addGestureRecognizer:longPress];
+        }
+        
+        //UIShortTapGestureRecognizer *singleTap;
+        UIShortTapGestureRecognizer *doubleTap;
+        
+        if (doubleTapEnabled && !isDTAdded && !popOver){
+            HBLogDebug(@"Added gesture");
+            doubleTap = [[UIShortTapGestureRecognizer alloc] initWithTarget:xpad action:@selector(activateDTActions:)];
+            doubleTap.numberOfTapsRequired = 2;
+            NSString *gestureIdentifier = [NSString stringWithFormat:@"XPad-DT-%@",NSStringFromSelector([btn action])];
+            doubleTap.name = gestureIdentifier;
+            [btnView addGestureRecognizer:doubleTap];
+        }
+        /*
+         if (doubleTapEnabled && !isSTAdded){
+         HBLogDebug(@"Added gesture");
+         singleTap = [[UIShortTapGestureRecognizer alloc] initWithTarget:xpad action:btn.action];
+         singleTap.numberOfTapsRequired = 1;
+         NSString *gestureIdentifier = [NSString stringWithFormat:@"XPad-ST-%@",NSStringFromSelector([btn action])];
+         singleTap.name = gestureIdentifier;
+         [singleTap requireGestureRecognizerToFail:doubleTap];
+         [btnView addGestureRecognizer:singleTap];
+         
+         }
+         */
+        
+    }
 }
 
 -(void)prepareForPopoverPresentation:(id)arg1{
-    //[self.xpad runCommand:@"stb"];
+    //[xpad runCommand:@"stb"];
     %orig;
-    [self installGesturesForButtonGroupIndex:1 assistantView:self.systemInputAssistantView popOver:YES];
+    [self installGesturesForButtonGroupIndex:1 groups:self.systemInputAssistantView.leftButtonBar.buttonGroups popOver:YES];
 }
 
 -(void)setCenterViewController:(id)arg1{
     %orig;
     if (!self.systemInputAssistantView.centerViewHidden){
-        if (!self.xpad.centerViewChangedDispatchBlock){
-            self.xpad.centerViewChangedDispatchBlock = dispatch_block_create(static_cast<dispatch_block_flags_t>(0), ^{
+        if (!xpad.centerViewChangedDispatchBlock){
+            xpad.centerViewChangedDispatchBlock = dispatch_block_create(static_cast<dispatch_block_flags_t>(0), ^{
                 if (self){
-                    [self installGesturesForButtonGroupIndex:1 assistantView:self.systemInputAssistantView popOver:NO];
+                    [self installGesturesForButtonGroupIndex:1 groups:self.systemInputAssistantView.leftButtonBar.buttonGroups popOver:NO];
                 }
-                self.xpad.centerViewChangedDispatchBlock = nil;
+                xpad.centerViewChangedDispatchBlock = nil;
             });
             
         }
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), self.xpad.centerViewChangedDispatchBlock);
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), xpad.centerViewChangedDispatchBlock);
     }
     
 }
@@ -3451,42 +3508,49 @@ NSString *preferencesSelectorForIdentifier(NSString* identifier, int selectorNum
     TUISystemInputAssistantView *assistantView = %orig;
     //HBLogDebug(@"GROUP: %@", assistantView.leftButtonBar.buttonGroups);
     /*
-     if (self.xpad.shouldAddCopyLogButton && isCopyLogInstalled && [assistantView.leftButtonBar.buttonGroups count] >0){
+     if (xpad.shouldAddCopyLogButton && isCopyLogInstalled && [assistantView.leftButtonBar.buttonGroups count] >0){
      UIBarButtonItem *copyLogButton = [((UIBarButtonItemGroup *)(assistantView.leftButtonBar.buttonGroups)[0]).items lastObject];
      if (copyLogButton && [NSStringFromSelector([copyLogButton action]) isEqualToString:@"openLog"]){
      //HBLogDebug(@"CopyLOG : %@", copyLogButton);
-     if (preferencesBool(kCollapseCopyLogkey, NO) && [self.xpad.XPadShortcutsBundle count] > 0){
-     //[self.xpad.XPadShortcutsBundle addObject:copyLogButton];
-     [self.xpad.XPadShortcutsBundle insertObject:copyLogButton atIndex:0];
-     self.xpad.XPadShortcutsBundleGroup = [[UIBarButtonItemGroup alloc]
-     initWithBarButtonItems:self.xpad.XPadShortcutsBundle representativeItem:self.xpad.bundleButton];
+     if (preferencesBool(kCollapseCopyLogkey, NO) && [xpad.XPadShortcutsBundle count] > 0){
+     //[xpad.XPadShortcutsBundle addObject:copyLogButton];
+     [xpad.XPadShortcutsBundle insertObject:copyLogButton atIndex:0];
+     xpad.XPadShortcutsBundleGroup = [[UIBarButtonItemGroup alloc]
+     initWithBarButtonItems:xpad.XPadShortcutsBundle representativeItem:xpad.bundleButton];
      }else{
-     [self.xpad.XPadShortcuts addObject:copyLogButton];
-     self.xpad.XPadShortcutsGroup = [[UIBarButtonItemGroup alloc]
-     initWithBarButtonItems:self.xpad.XPadShortcuts representativeItem:nil];
+     [xpad.XPadShortcuts addObject:copyLogButton];
+     xpad.XPadShortcutsGroup = [[UIBarButtonItemGroup alloc]
+     initWithBarButtonItems:xpad.XPadShortcuts representativeItem:nil];
      }
-     self.xpad.shouldAddCopyLogButton = NO;
+     xpad.shouldAddCopyLogButton = NO;
      
      }
      }
      */
-    if ([self.xpad.XPadShortcutsBundle count] > 0){
-        assistantView.leftButtonBar.buttonGroups = @[self.xpad.XPadShortcutsGroup, self.xpad.XPadShortcutsBundleGroup];
+    if ([xpad.XPadShortcutsBundle count] > 0){
+        assistantView.leftButtonBar.buttonGroups = @[xpad.XPadShortcutsGroup, xpad.XPadShortcutsBundleGroup];
     }else{
-        assistantView.leftButtonBar.buttonGroups = @[self.xpad.XPadShortcutsGroup];
+        assistantView.leftButtonBar.buttonGroups = @[xpad.XPadShortcutsGroup];
     }
     
     if (preferencesBool(kColorEnabledkey,NO)){
         if (preferencesBool(kShortcutsTintEnabled,YES)) assistantView.leftButtonBar.tintColor = currentTintColor;
-            }
+    }
     
-    [self installGesturesForButtonGroupIndex:0 assistantView:assistantView popOver:NO];
-    [self installGesturesForButtonGroupIndex:1 assistantView:assistantView popOver:NO];
-    
-    if (self.xpad.keyboardInputTypeButton){
+    [self installGesturesForButtonGroupIndex:0 groups:assistantView.leftButtonBar.buttonGroups popOver:NO];
+    [self installGesturesForButtonGroupIndex:1 groups:assistantView.leftButtonBar.buttonGroups popOver:NO];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (xpad.XPadShortcutsFloatGroup){
+            [self installGesturesForButtonGroupIndex:0 groups:@[xpad.XPadShortcutsFloatGroup] popOver:NO];
+        }
+        if (xpad.XPadShortcutsBundleFloatGroup){
+            [self installGesturesForButtonGroupIndex:0 groups:@[xpad.XPadShortcutsBundleFloatGroup] popOver:NO];
+        }
+    });
+    if (xpad.keyboardInputTypeButton){
         kbImpl = [%c(UIKeyboardImpl) activeInstance];
         delegate = kbImpl.privateInputDelegate ?: kbImpl.inputDelegate;
-        self.xpad.keyboardInputTypeButton.image = [XPadHelper imageForName:[delegate respondsToSelector:@selector(keyboardType)]?@"number.circle.fill":@"number.circle" withSystemColor:NO completion:nil];
+        xpad.keyboardInputTypeButton.image = [XPadHelper imageForName:[delegate respondsToSelector:@selector(keyboardType)]?@"number.circle.fill":@"number.circle" withSystemColor:NO completion:nil];
     }
     return assistantView;
 }
@@ -3538,15 +3602,16 @@ static void reloadPrefs() {
         if (isSpringBoard){
             dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
                 ShortcutsGenerator *shortcutsGenerator = [ShortcutsGenerator sharedInstance];
-
+                
                 NSKeyedUnarchiver *unarchiver = [[NSKeyedUnarchiver alloc] initForReadingFromData:prefs[kCachekey] error:nil];
                 unarchiver.requiresSecureCoding = NO;
                 int cacheDylibSum = [[unarchiver decodeObjectForKey:@"copyLogDylibExist"] intValue] + [[unarchiver decodeObjectForKey:@"translomaticDylibExist"] intValue] + [[unarchiver decodeObjectForKey:@"wasabiDylibExist"] intValue] + [[unarchiver decodeObjectForKey:@"pasitheaDylibExist"] intValue] + [[unarchiver decodeObjectForKey:@"copypastaDylibExist"] intValue] + [[unarchiver decodeObjectForKey:@"loupeDylibExist"] intValue];
                 int actualDylibSum = [@(shortcutsGenerator.copyLogDylibExist) intValue] + [@(shortcutsGenerator.translomaticDylibExist) intValue] + [@(shortcutsGenerator.wasabiDylibExist) intValue] + [@(shortcutsGenerator.pasitheaDylibExist) intValue] + [@(shortcutsGenerator.copypastaDylibExist) intValue] + [@(shortcutsGenerator.loupeDylibExist) intValue];
+                BOOL upgradedFromUnsupportedCache = !([unarchiver containsValueForKey:@"XPadShortcutsFloat"] || [unarchiver containsValueForKey:@"XPadShortcutsBundleFloat"]);
                 [unarchiver finishDecoding];
-
+                
                 //NSLog(@"XPAD cache: %d ** actual: %d", cacheDylibSum, actualDylibSum);
-                if (prefs[kCachekey] && (cacheDylibSum != actualDylibSum)){
+                if ((prefs[kCachekey] && (cacheDylibSum != actualDylibSum)) || (prefs[kCachekey] && upgradedFromUnsupportedCache)){
                     [[PrefsManager sharedInstance] removeKey:kCachekey fromSandbox:!isSpringBoard];
                     //NSLog(@"XPAD cache deleted");
                 }
@@ -3586,7 +3651,7 @@ static void reloadPrefs() {
                         isCopyLogInstalled = YES;
                     }
                     if ( preferencesBool(kEnabledkey,YES)){
-                        %init(XPad);
+                        %init(XPAD_GROUP);
                     }
                     CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(), NULL, (CFNotificationCallback)reloadPrefs, (CFStringRef)kPrefsChangedIdentifier, NULL, CFNotificationSuspensionBehaviorDeliverImmediately);
                     CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(), NULL, (CFNotificationCallback)updateAutoCorrection, (CFStringRef)kAutoCorrectionChangedIdentifier, NULL, CFNotificationSuspensionBehaviorDeliverImmediately);
