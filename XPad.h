@@ -161,6 +161,7 @@ BOOL loupeSwitchState() __attribute__((weak));
 @property (nonatomic, strong) UIBarButtonItemGroup *XPadShortcutsFloatGroup;
 @property (nonatomic, strong) UIBarButtonItemGroup *XPadShortcutsBundleFloatGroup;
 @property (nonatomic, strong) UIBarButtonItem *bundleButton;
+@property (nonatomic, strong) UIBarButtonItem *bundleFloatButton;
 @property (nonatomic, strong) NSMutableArray *XPadShortcuts;
 @property (nonatomic, strong) NSMutableArray *XPadShortcutsBundle;
 @property (nonatomic, strong) NSMutableArray *XPadShortcutsFloat;

@@ -201,6 +201,9 @@ NSString *preferencesSelectorForIdentifier(NSString* identifier, int selectorNum
             self.XPadShortcutsBundleFloatGroup = [unarchiver decodeObjectForKey:@"XPadShortcutsBundleFloatGroup"];
             self.kbType = [unarchiver decodeObjectForKey:@"kbType"];
             self.kbTypeLabel = [unarchiver decodeObjectForKey:@"kbTypeLabel"];
+            self.bundleButton = [unarchiver decodeObjectForKey:@"bundleButton"];
+            self.bundleFloatButton = [unarchiver decodeObjectForKey:@"bundleFloatButton"];
+            
             self.autoCorrectionButton = [unarchiver decodeObjectForKey:@"autoCorrectionButton"];
             self.autoCapitalizationButton = [unarchiver decodeObjectForKey:@"autoCapitalizationButton"];
             self.keyboardInputTypeButton = [unarchiver decodeObjectForKey:@"keyboardInputTypeButton"];
@@ -388,11 +391,9 @@ NSString *preferencesSelectorForIdentifier(NSString* identifier, int selectorNum
             }
             
             if ([self.XPadShortcutsBundleFloat count] > 0){
-                if (!self.bundleButton){
-                    self.bundleButton = [[UIBarButtonItem alloc] initWithImage:[UIImage systemImageNamed:@"ellipsis.circle"] style:UIBarButtonItemStylePlain target:nil action:nil];
-                }
+                self.bundleFloatButton = [[UIBarButtonItem alloc] initWithImage:[UIImage systemImageNamed:@"ellipsis.circle"] style:UIBarButtonItemStylePlain target:nil action:nil];
                 self.XPadShortcutsBundleFloatGroup = [[UIBarButtonItemGroup alloc]
-                                                      initWithBarButtonItems:self.XPadShortcutsBundleFloat representativeItem:self.bundleButton];
+                                                      initWithBarButtonItems:self.XPadShortcutsBundleFloat representativeItem:self.bundleFloatButton];
             }
             
             dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
@@ -412,11 +413,15 @@ NSString *preferencesSelectorForIdentifier(NSString* identifier, int selectorNum
                 [archiver encodeObject:self.XPadShortcutsBundleFloatGroup forKey:@"XPadShortcutsBundleFloatGroup"];
                 [archiver encodeObject:self.kbType forKey:@"kbType"];
                 [archiver encodeObject:self.kbTypeLabel forKey:@"kbTypeLabel"];
+                [archiver encodeObject:self.bundleButton forKey:@"bundleButton"];
+                [archiver encodeObject:self.bundleFloatButton forKey:@"bundleFloatButton"];
+                
                 [archiver encodeObject:self.autoCorrectionButton forKey:@"autoCorrectionButton"];
                 [archiver encodeObject:self.autoCapitalizationButton forKey:@"autoCapitalizationButton"];
                 [archiver encodeObject:self.keyboardInputTypeButton forKey:@"keyboardInputTypeButton"];
                 [archiver encodeObject:self.loupeButton forKey:@"loupeButton"];
-                
+
+
                 [archiver encodeObject:@(self.shortcutsGenerator.copyLogDylibExist) forKey:@"copyLogDylibExist"];
                 [archiver encodeObject:@(self.shortcutsGenerator.translomaticDylibExist) forKey:@"translomaticDylibExist"];
                 [archiver encodeObject:@(self.shortcutsGenerator.wasabiDylibExist) forKey:@"wasabiDylibExist"];
@@ -3607,7 +3612,7 @@ static void reloadPrefs() {
                 unarchiver.requiresSecureCoding = NO;
                 int cacheDylibSum = [[unarchiver decodeObjectForKey:@"copyLogDylibExist"] intValue] + [[unarchiver decodeObjectForKey:@"translomaticDylibExist"] intValue] + [[unarchiver decodeObjectForKey:@"wasabiDylibExist"] intValue] + [[unarchiver decodeObjectForKey:@"pasitheaDylibExist"] intValue] + [[unarchiver decodeObjectForKey:@"copypastaDylibExist"] intValue] + [[unarchiver decodeObjectForKey:@"loupeDylibExist"] intValue];
                 int actualDylibSum = [@(shortcutsGenerator.copyLogDylibExist) intValue] + [@(shortcutsGenerator.translomaticDylibExist) intValue] + [@(shortcutsGenerator.wasabiDylibExist) intValue] + [@(shortcutsGenerator.pasitheaDylibExist) intValue] + [@(shortcutsGenerator.copypastaDylibExist) intValue] + [@(shortcutsGenerator.loupeDylibExist) intValue];
-                BOOL upgradedFromUnsupportedCache = !([unarchiver containsValueForKey:@"XPadShortcutsFloat"] || [unarchiver containsValueForKey:@"XPadShortcutsBundleFloat"]);
+                BOOL upgradedFromUnsupportedCache = !([unarchiver containsValueForKey:@"XPadShortcutsFloat"] && [unarchiver containsValueForKey:@"XPadShortcutsBundleFloat"] && [unarchiver containsValueForKey:@"bundleButton"] && [unarchiver containsValueForKey:@"bundleFloatButton"]);
                 [unarchiver finishDecoding];
                 
                 //NSLog(@"XPAD cache: %d ** actual: %d", cacheDylibSum, actualDylibSum);
