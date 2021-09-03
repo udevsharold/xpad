@@ -11,11 +11,11 @@
 		<key>detail</key>
 		<string>XPPRootListController</string>
 		<key>icon</key>
-		<string>XPXPad.png</string>
+		<string>XPad.png</string>
 		<key>isController</key>
 		<true/>
 		<key>label</key>
-		<string>XPXPad</string>
+		<string>XPad</string>
 	</dict>
 </dict>
 </plist>
