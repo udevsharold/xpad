@@ -13,7 +13,7 @@ include $(THEOS)/makefiles/common.mk
 
 TWEAK_NAME = XPad
 
-XPad_FILES = $(wildcard *.xm) $(wildcard *.x) $(wildcard *.m)
+XPad_FILES = $(wildcard *.xm) $(wildcard *.x) $(wildcard *.m) $(wildcard *.mm)
 XPad_CFLAGS = -fobjc-arc
 XPad_LIBRARIES = rocketbootstrap sparkcolourpicker
 XPad_PRIVATE_FRAMEWORKS = AppSupport Preferences

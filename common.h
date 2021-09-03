@@ -1,8 +1,8 @@
-#include <Foundation/Foundation.h>
-#include <UIKit/UIKit.h>
-#include <HBLog.h>
+#import <Foundation/Foundation.h>
+#import <UIKit/UIKit.h>
+#import <HBLog.h>
 
-#import "PrefsManager.h"
+#import "XPPrefsManager.h"
 
 #define bundlePath @"/Library/PreferenceBundles/XPadPrefs.bundle"
 #define LOCALIZED(str) [tweakBundle localizedStringForKey:str value:@"" table:nil]
@@ -74,6 +74,8 @@
 #define maxdefaultshortcutskbtype 3
 
 #define secondActionDelay 0.05
+
+#define XPadCachePath @"/private/var/mobile/Library/Caches/com.udevs.xpad"
 
 typedef NS_ENUM(NSInteger, DXPhonemesType){
     DXPhonemesTypeVowel,

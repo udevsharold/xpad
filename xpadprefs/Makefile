@@ -4,7 +4,7 @@ include $(THEOS)/makefiles/common.mk
 
 BUNDLE_NAME = XPadPrefs
 
-XPadPrefs_FILES = $(wildcard *.m) $(wildcard *.mm) ../PrefsManager.x ../ShortcutsGenerator.x ../XPadHelper.x
+XPadPrefs_FILES = $(wildcard *.m) $(wildcard *.mm) ../XPPrefsManager.m ../XPShortcutsGenerator.m ../XPHelper.m
 XPadPrefs_INSTALL_PATH = /Library/PreferenceBundles
 XPadPrefs_FRAMEWORKS = UIKit
 XPadPrefs_PRIVATE_FRAMEWORKS = Preferences AppSupport

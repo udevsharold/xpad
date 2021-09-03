@@ -204,7 +204,7 @@
 			<key>cell</key>
 			<string>PSLinkCell</string>
 			<key>detail</key>
-			<string>XPadItems</string>
+			<string>XPPManageShortcutsController</string>
 			<key>label</key>
 			<string>Manage Shortcuts</string>
 		</dict>
@@ -547,6 +547,6 @@
 		</dict>
 	</array>
 	<key>title</key>
-	<string>XPad</string>
+	<string>XPXPad</string>
 </dict>
 </plist>

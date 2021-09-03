@@ -9,13 +9,13 @@
 		<key>cell</key>
 		<string>PSLinkCell</string>
 		<key>detail</key>
-		<string>XPadRootListController</string>
+		<string>XPPRootListController</string>
 		<key>icon</key>
-		<string>XPad.png</string>
+		<string>XPXPad.png</string>
 		<key>isController</key>
 		<true/>
 		<key>label</key>
-		<string>XPad</string>
+		<string>XPXPad</string>
 	</dict>
 </dict>
 </plist>

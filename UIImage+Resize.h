@@ -1,4 +1,4 @@
-#include <UIKit/UIKit.h>
+#import <UIKit/UIKit.h>
 
 @interface UIImage (Resize)
 +(UIImage *)imageWithImage:(UIImage *)image resize:(CGSize)newSize;
