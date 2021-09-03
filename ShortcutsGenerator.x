@@ -42,6 +42,7 @@
         self.pasitheaDylibExist = [self dylibExist:pasitheaDylib manager:fileManager];
         self.copypastaDylibExist = [self dylibExist:copypastaDylib manager:fileManager];
         self.loupeDylibExist = [self dylibExist:loupeDylib manager:fileManager];
+        self.tranzloDylibExist = [self dylibExist:tranzloDylib manager:fileManager];
     }
     return self;
 }
@@ -119,6 +120,9 @@
             [thirdPartArray addObject:@"magnifyingglass.circle.fill"];
         }
     }
+    if (self.tranzloDylibExist){
+        [thirdPartArray addObject:@"CUSTOM_/Library/Shortmoji/Shortcuts/TranzloTranslateShortcut.bundle/icon.png"];
+    }
     return thirdPartArray;
 }
 
@@ -166,6 +170,13 @@
             [thirdPartArray addObject:@"loupeAction:"];
         }
     }
+    if (self.tranzloDylibExist){
+        if (longPress){
+            [thirdPartArray addObject:@"tranzloActionLP:"];
+        }else{
+            [thirdPartArray addObject:@"tranzloAction:"];
+        }
+    }
     return thirdPartArray;
 }
 
@@ -188,6 +199,9 @@
     }
     if (self.loupeDylibExist){
         [thirdPartArray addObject:@"Loupe"];
+    }
+    if (self.tranzloDylibExist){
+        [thirdPartArray addObject:@"Tranzlo"];
     }
     return thirdPartArray;
 }

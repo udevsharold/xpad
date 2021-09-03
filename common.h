@@ -48,6 +48,7 @@
 #define kEnabledSkipEmojikey @"skipEmojiInputBOOL"
 #define kCachekey @"cache"
 #define kUpdateCachekey @"updateCache"
+#define kSpongebobEntropyKey @"spongebobEntropy"
 
 #define toastWidth 50
 #define toastHeight 50
@@ -73,6 +74,18 @@
 #define maxdefaultshortcutskbtype 3
 
 #define secondActionDelay 0.05
+
+typedef NS_ENUM(NSInteger, DXPhonemesType){
+    DXPhonemesTypeVowel,
+    DXPhonemesTypeConsonent
+};
+
+typedef NS_ENUM(NSInteger, DXStudlyCapsType){
+    DXStudlyCapsTypeRandom,
+    DXStudlyCapsTypeAlternate,
+    DXStudlyCapsTypeVowel,
+    DXStudlyCapsTypeConsonent
+};
 
 @interface CPDistributedMessagingCenter : NSObject
 + (id)centerNamed:(id)arg1;

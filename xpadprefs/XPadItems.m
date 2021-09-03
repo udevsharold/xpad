@@ -10,8 +10,10 @@
 #include "DeleteOptions.h"
 #include "GlobeOptions.h"
 #include "PasteOptions.h"
+#import "DXPSpongebobOptions.h"
 
 static BOOL translomaticInstalled = NO;
+static BOOL tranzloInstalled = NO;
 
 @implementation XPadItems
 
@@ -43,8 +45,7 @@ static BOOL translomaticInstalled = NO;
     }
 }
 
-- (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section
-{
+- (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section{
     NSString *footerTextForSectionOne = @"";
     switch (section) {
         case 0:
@@ -83,6 +84,9 @@ static BOOL translomaticInstalled = NO;
                                        "Globe - activate dictation"];
             if (translomaticInstalled){
                 footerTextForSectionOne = [footerTextForSectionOne stringByAppendingString:@"\nTranslomatic - select paragraph and translate"];
+            }
+            if (tranzloInstalled){
+                footerTextForSectionOne = [footerTextForSectionOne stringByAppendingString:@"\nTranzlo - select paragraph and translate"];
             }
             return footerTextForSectionOne;
         default:
@@ -267,10 +271,14 @@ static BOOL translomaticInstalled = NO;
             [pasteOptions setRootController: [self rootController]];
             [pasteOptions setParentController: [self parentController]];
             [self pushController:pasteOptions];
+        }else if ([self.extrasOptions[indexPath.row][@"identifier"] isEqualToString:@"spongebob"]){
+            DXPSpongebobOptions *spongebobOptions = [[DXPSpongebobOptions alloc] init];
+            [spongebobOptions setRootController: [self rootController]];
+            [spongebobOptions setParentController: [self parentController]];
+            [self pushController:spongebobOptions];
         }
     }
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
-    
 }
 
 - (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)sourceIndexPath toIndexPath:(NSIndexPath *)destinationIndexPath {
@@ -424,7 +432,7 @@ static BOOL translomaticInstalled = NO;
     NSMutableArray *defaultOrderImages = [[shortcutsGenerator imageNameArrayForiOS:1] mutableCopy];
     
     translomaticInstalled = shortcutsGenerator.translomaticDylibExist;
-    
+    tranzloInstalled = shortcutsGenerator.tranzloDylibExist;
     
     
     NSMutableArray *fullOrderDict = [[NSMutableArray alloc] init];
@@ -474,6 +482,7 @@ static BOOL translomaticInstalled = NO;
             if ([[currentOrderDefault objectAtIndex:i][@"selector"] isEqualToString:@"pasitheaAction:"] && !shortcutsGenerator.pasitheaDylibExist) continue;
             if ([[currentOrderDefault objectAtIndex:i][@"selector"] isEqualToString:@"copypastaAction:"] && !shortcutsGenerator.copypastaDylibExist) continue;
             if ([[currentOrderDefault objectAtIndex:i][@"selector"] isEqualToString:@"loupeAction:"] && !shortcutsGenerator.loupeDylibExist) continue;
+            if ([[currentOrderDefault objectAtIndex:i][@"selector"] isEqualToString:@"tranzloAction:"] && !shortcutsGenerator.tranzloDylibExist) continue;
             [self.currentOrder[0] addObject:[currentOrderDefault objectAtIndex:i]];
         }
     }else{
@@ -487,6 +496,7 @@ static BOOL translomaticInstalled = NO;
             if ([defaultOrderSelector[i] isEqualToString:@"pasitheaAction:"] && !shortcutsGenerator.pasitheaDylibExist) continue;
             if ([defaultOrderSelector[i] isEqualToString:@"copypastaAction:"] && !shortcutsGenerator.copypastaDylibExist) continue;
             if ([defaultOrderSelector[i] isEqualToString:@"loupeAction:"] && !shortcutsGenerator.loupeDylibExist) continue;
+            if ([defaultOrderSelector[i] isEqualToString:@"tranzloAction:"] && !shortcutsGenerator.tranzloDylibExist) continue;
             [defaultOrderDict addObject: @{
                 @"label" : defaultOrderLabel[i],
                 @"images" : defaultOrderImages[i],
@@ -505,6 +515,7 @@ static BOOL translomaticInstalled = NO;
             if ([[currentOrderDefault objectAtIndex:i][@"selector"] isEqualToString:@"pasitheaAction:"] && !shortcutsGenerator.pasitheaDylibExist) continue;
             if ([[currentOrderDefault objectAtIndex:i][@"selector"] isEqualToString:@"copypastaAction:"] && !shortcutsGenerator.copypastaDylibExist) continue;
             if ([[currentOrderDefault objectAtIndex:i][@"selector"] isEqualToString:@"loupeAction:"] && !shortcutsGenerator.loupeDylibExist) continue;
+            if ([[currentOrderDefault objectAtIndex:i][@"selector"] isEqualToString:@"tranzloAction:"] && !shortcutsGenerator.tranzloDylibExist) continue;
             [self.currentOrder[1] addObject:[currentOrderDefault objectAtIndex:i]];
         }
         if (newShortcutsAvailable){
@@ -516,6 +527,7 @@ static BOOL translomaticInstalled = NO;
                 if ([[defaultOrderSelector objectAtIndex:i] isEqualToString:@"pasitheaAction:"] && !shortcutsGenerator.pasitheaDylibExist) continue;
                 if ([[defaultOrderSelector objectAtIndex:i] isEqualToString:@"copypastaAction:"] && !shortcutsGenerator.copypastaDylibExist) continue;
                 if ([[defaultOrderSelector objectAtIndex:i] isEqualToString:@"loupeAction:"] && !shortcutsGenerator.loupeDylibExist) continue;
+                if ([[defaultOrderSelector objectAtIndex:i] isEqualToString:@"tranzloAction:"] && !shortcutsGenerator.tranzloDylibExist) continue;
                 [fullOrderDict addObject: @{
                     @"label" : defaultOrderLabel[i],
                     @"images" : defaultOrderImages[i],
@@ -542,6 +554,7 @@ static BOOL translomaticInstalled = NO;
             if ([defaultOrderSelector[i] isEqualToString:@"pasitheaAction:"] && !shortcutsGenerator.pasitheaDylibExist) continue;
             if ([defaultOrderSelector[i] isEqualToString:@"copypastaAction:"] && !shortcutsGenerator.copypastaDylibExist) continue;
             if ([defaultOrderSelector[i] isEqualToString:@"loupeAction:"] && !shortcutsGenerator.loupeDylibExist) continue;
+            if ([defaultOrderSelector[i] isEqualToString:@"tranzloAction:"] && !shortcutsGenerator.tranzloDylibExist) continue;
             [defaultOrderDict addObject: @{
                 @"label" : defaultOrderLabel[i],
                 @"images" : defaultOrderImages[i],
@@ -552,9 +565,9 @@ static BOOL translomaticInstalled = NO;
         self.currentOrder[1] = defaultOrderDict;
     }
     
-    NSArray *extrasOptionsLabel = @[@"Keyboard Input Behaviour", @"Shell Commands", @"Insert Text Content", @"Previous Word Behaviour", @"Next Word Behaviour", @"Line Start Behaviour", @"Line End Behaviour", @"Start of Paragraph Behaviour", @"End of Paragraph Behaviour", @"Start of Sentence Behaviour", @"End of Sentence Behaviour", @"Delete Behaviour", @"Delete Forward Behaviour", @"Globe Behaviour", @"Paste Behaviour"];
-    NSArray *extrasOptionsID = @[@"keyboardType", @"shellCommand", @"insertText", @"prevWord", @"nextWord", @"lineStart", @"lineEnd", @"startOfParagraph", @"endOfParagraph", @"startOfSentence", @"endOfSentence", @"delete", @"deleteForward", @"globe", @"paste"];
-    NSArray *extrasOptions13 = @[@"number.circle.fill", @"command", @"text.bubble", @"arrow.left.circle.fill", @"arrow.right.circle.fill", @"arrow.left.to.line", @"arrow.right.to.line", @"text.insert", @"text.append", @"decrease.quotelevel", @"increase.quotelevel", @"delete.left", @"delete.right", @"globe", @"doc.on.clipboard"];
+    NSArray *extrasOptionsLabel = @[@"Keyboard Input Behaviour", @"Shell Commands", @"Insert Text Content", @"Previous Word Behaviour", @"Next Word Behaviour", @"Line Start Behaviour", @"Line End Behaviour", @"Start of Paragraph Behaviour", @"End of Paragraph Behaviour", @"Start of Sentence Behaviour", @"End of Sentence Behaviour", @"Delete Behaviour", @"Delete Forward Behaviour", @"Globe Behaviour", @"Paste Behaviour", @"sPonGeBob teXt Behaviour"];
+    NSArray *extrasOptionsID = @[@"keyboardType", @"shellCommand", @"insertText", @"prevWord", @"nextWord", @"lineStart", @"lineEnd", @"startOfParagraph", @"endOfParagraph", @"startOfSentence", @"endOfSentence", @"delete", @"deleteForward", @"globe", @"paste", @"spongebob"];
+    NSArray *extrasOptions13 = @[@"number.circle.fill", @"command", @"text.bubble", @"arrow.left.circle.fill", @"arrow.right.circle.fill", @"arrow.left.to.line", @"arrow.right.to.line", @"text.insert", @"text.append", @"decrease.quotelevel", @"increase.quotelevel", @"delete.left", @"delete.right", @"globe", @"doc.on.clipboard", @"circle.grid.3x3"];
     
     NSMutableArray *extrasOptionsDict = [[NSMutableArray alloc] init];
     

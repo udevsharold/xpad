@@ -50,6 +50,7 @@
 "SHORT_PASITHEA" = "Psthea";
 "SHORT_COPYPASTA" = "Copypasta";
 "SHORT_LOUPE" = "Loupe";
+"SHORT_TRANZLO" = "Trnzlo";
 "SHORT_SPONGEBOB" = "sPoNge";
 
 //=====================Long Text for Shortcuts=====================
@@ -101,6 +102,7 @@
 "LONG_PASITHEA" = "Pasithea";
 "LONG_COPYPASTA" = "Copypasta";
 "LONG_LOUPE" = "Loupe";
+"LONG_TRANZLO" = "Tranzlo";
 "LONG_SPONGEBOB" = "sPonGeBob teXt";
 
 //=====================Toast=====================
@@ -151,6 +153,7 @@
 "TOAST_PASITHEA" = "Pasithea";
 "TOAST_COPYPASTA" = "Copypasta";
 "TOAST_LOUPE" = "Loupe";
+"TOAST_TRANZLO" = "Tranzlo";
 "TOAST_SPONGEBOB" = "sPoNge";
 "TOAST_ON" = "On";
 "TOAST_OFF" = "Off";
@@ -187,6 +190,7 @@
 "EXTRAS_DELETE_FORWARD_BEHAVIOUR" = "Delete Forward Behaviour";
 "EXTRAS_GLOBE_BEHAVIOUR" = "Globe Behaviour";
 "EXTRAS_PASTE_BEHAVIOUR" = "Paste Behaviour";
+"EXTRAS_SPONGEBOB_BEHAVIOUR" = "sPonGeBob teXt Behaviour";
 
 //Title
 "ENABLED_SHORTCUTS" = "Enabled Shorcuts";
@@ -241,6 +245,7 @@ Globe - activate dictation
 sPonGeBob teXt - select all and sPonGeBob";
 
 "FOOTER_TEXT_FOR_DEFAULT_LONG_PRESS_GESTURES_TRANSLOMATIC" = "Translomatic - select paragraph and translate";
+"FOOTER_TEXT_FOR_DEFAULT_LONG_PRESS_GESTURES_TRANZLO" = "Tranzlo - select paragraph and translate";
 
 //=====================CUSTOM ACTIONS PAGE=====================
 "FIRST_ACTION" = "First Action";
@@ -320,6 +325,14 @@ sPonGeBob teXt - select all and sPonGeBob";
 "PASTE_AND_GO_DISABLED" = "Disabled";
 "PASTE_AND_GO_URL_ONLY" = "URL Only";
 "PASTE_AND_GO_EVERYTHING" = "Everything";
+
+//=====================SPONGEBOB BEHAVIOR=====================
+"SPONGEBOB_ENTROPY" = "Randomness of Spongebob Text";
+"FOOTER_SPONGEBOB_ENTROPY" = "Select the entropy for the randomness of generated text.";
+"SPONGEBOB_RANDOM" = "Random";
+"SPONGEBOB_ALTERNATE" = "Alternate";
+"SPONGEBOB_VOWEL" = "Vowel";
+"SPONGEBOB_CONSONENT" = "Consonent";
 
 //=====================MISC=====================
 "SEARCHBAR_PLACEHOLDER" = "How Does It Looks?";

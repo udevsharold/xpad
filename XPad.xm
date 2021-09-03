@@ -47,6 +47,7 @@ static UISystemInputAssistantViewController *systemAssistantController;
 static BOOL doubleTapEnabled  = NO;
 static NSBundle *tweakBundle;
 static BOOL firstInit = YES;
+static DXStudlyCapsType spongebobEntropy;
 
 BOOL preferencesBool(NSString* key, BOOL fallback) {
     NSNumber* value;
@@ -281,6 +282,9 @@ NSString *preferencesSelectorForIdentifier(NSString* identifier, int selectorNum
                     if ([selectorName isEqualToString:@"loupeAction:"] && !self.shortcutsGenerator.loupeDylibExist){
                         continue;
                     }
+                    if ([selectorName isEqualToString:@"tranzloAction:"] && !self.shortcutsGenerator.tranzloDylibExist){
+                        continue;
+                    }
                     
                     UIBarButtonItem *shortcutButton = [[UIBarButtonItem alloc] initWithImage:[XPadHelper imageForName:item[@"images"] withSystemColor:NO completion:nil] style:UIBarButtonItemStylePlain target:self action:NSSelectorFromString(selectorName)];
                     UIBarButtonItem *shortcutButtonFloat = [[UIBarButtonItem alloc] initWithImage:[XPadHelper imageForName:item[@"images"] withSystemColor:NO completion:nil] style:UIBarButtonItemStylePlain target:self action:NSSelectorFromString(selectorName)];
@@ -428,7 +432,8 @@ NSString *preferencesSelectorForIdentifier(NSString* identifier, int selectorNum
                 [archiver encodeObject:@(self.shortcutsGenerator.pasitheaDylibExist) forKey:@"pasitheaDylibExist"];
                 [archiver encodeObject:@(self.shortcutsGenerator.copypastaDylibExist) forKey:@"copypastaDylibExist"];
                 [archiver encodeObject:@(self.shortcutsGenerator.loupeDylibExist) forKey:@"loupeDylibExist"];
-                
+                [archiver encodeObject:@(self.shortcutsGenerator.tranzloDylibExist) forKey:@"tranzloDylibExist"];
+
                 [archiver finishEncoding];
                 //NSLog(@"XPAD: %@", error);
                 
@@ -2304,6 +2309,39 @@ NSString *preferencesSelectorForIdentifier(NSString* identifier, int selectorNum
     showCopypastaWithNotification();
 }
 
+-(void)tranzloAction:(UIBarButtonItem *)sender{
+    if (!self.shortcutsGenerator.tranzloDylibExist){
+        return;
+    }
+    [self triggerImpactAndAnimationWithButton:sender selectorName:NSStringFromSelector(_cmd) toastWidthOffset:0 toastHeightOffset:0];
+    UIResponder <UITextInput> *tempDelegate = (UIResponder <UITextInput> *)delegate;
+    NSString *selectedString = @"";
+    BOOL isWKContentView = [tempDelegate isKindOfClass:objc_getClass("WKContentView")];
+    if (isWKContentView){
+        selectedString = [(WKContentView *)tempDelegate selectedText];
+        [(WKContentView *)tempDelegate select:nil];
+        if ([selectedString length] == 0) return;
+    }else{
+        selectedString = [tempDelegate textInRange:[tempDelegate selectedTextRange]];
+        
+        if (!selectedString.length) {
+            UITextRange *textRange = [self autoDirectionWordSelectedTextRangeWithDelegate:tempDelegate];
+            if (!textRange) return;
+            tempDelegate.selectedTextRange = textRange;
+            selectedString = [tempDelegate textInRange:textRange];
+        }
+        if ([selectedString length] == 0) return;
+        
+    }
+    
+    TZManager *tzManager = [(objc_getClass("TZManager")) sharedManager];
+    if ([tzManager respondsToSelector:@selector(translateTextWithShortmojiShortcut:showInAlert:)]){
+        [[(objc_getClass("TZManager")) sharedManager] translateTextWithShortmojiShortcut:selectedString showInAlert:YES];
+    }else if ([tzManager respondsToSelector:@selector(translateText:)]){
+        [[(objc_getClass("TZManager")) sharedManager] translateText:selectedString];
+    }
+}
+
 -(void)globeAction:(UIBarButtonItem*)sender{
     [self triggerImpactAndAnimationWithButton:sender selectorName:NSStringFromSelector(_cmd) toastWidthOffset:0 toastHeightOffset:0];
     UIKeyboardInputModeController *kbController = [objc_getClass("UIKeyboardInputModeController") sharedInputModeController];
@@ -2325,14 +2363,71 @@ NSString *preferencesSelectorForIdentifier(NSString* identifier, int selectorNum
     [[objc_getClass("UIDictationController") sharedInstance] switchToDictationInputModeWithTouch:nil];
 }
 
+-(BOOL)boolWithProbability:(double)probability{
+    return rand() <  probability * ((double)RAND_MAX + 1.0);
+}
+
+-(NSString *)capitalize:(NSString *)theString probability:(double)probability{
+    NSInteger theStrLen = theString.length;
+    if (theStrLen == 0) return theString;
+    NSMutableString *capStr = [NSMutableString stringWithCapacity:theStrLen];
+    for (NSInteger i = 0; i < theStrLen; i++) {
+        NSRange range = NSMakeRange(i, 1);
+        NSString *character = [theString substringWithRange:range];
+        character = [self boolWithProbability:probability] ? [character uppercaseString] : [character lowercaseString];
+        [capStr appendString:character];
+    }
+    return [NSString stringWithString:capStr];
+}
+
+-(NSString *)capitalizeAlternatively:(NSString *)theString{
+    NSInteger theStrLen = theString.length;
+    if (theStrLen == 0) return theString;
+    BOOL firstSeed = [self boolWithProbability:0.5];
+    NSMutableString *capStr = [NSMutableString stringWithCapacity:theStrLen];
+    for (NSInteger i = 0; i < theStrLen; i++) {
+        NSRange range = NSMakeRange(i, 1);
+        NSString *character = [theString substringWithRange:range];
+        character = firstSeed ? [character uppercaseString] : [character lowercaseString];
+        firstSeed = !firstSeed;
+        [capStr appendString:character];
+    }
+    return [NSString stringWithString:capStr];
+}
+
+-(BOOL)isVowel:(NSString *)theString{
+    NSAssert([theString length] == 1, @"Invalid character length");
+    return ([@"aeiou" rangeOfString:[theString lowercaseString]].location != NSNotFound);
+}
+
+-(NSString *)capitalize:(NSString *)theString phonemes:(DXPhonemesType)type{
+    NSInteger theStrLen = theString.length;
+    if (theStrLen == 0) return theString;
+    NSMutableString *capStr = [NSMutableString stringWithCapacity:theStrLen];
+    for (NSInteger i = 0; i < theStrLen; i++) {
+        NSRange range = NSMakeRange(i, 1);
+        NSString *character = [theString substringWithRange:range];
+        switch (type){
+            case DXPhonemesTypeConsonent:{
+                character = ![self isVowel:character] ? [character uppercaseString] : [character lowercaseString];
+                break;
+            }
+            default:{
+                character = [self isVowel:character] ? [character uppercaseString] : [character lowercaseString];
+                break;
+            }
+        }
+        [capStr appendString:character];
+    }
+    return [NSString stringWithString:capStr];
+}
+
 -(void)spongebobAction:(UIBarButtonItem*)sender{
     [self triggerImpactAndAnimationWithButton:sender selectorName:NSStringFromSelector(_cmd) toastWidthOffset:10 toastHeightOffset:0];
     NSString *selectedString = [delegate textInRange:[delegate selectedTextRange]];
     if (!selectedString.length) {
         
         UITextRange *textRange;
-        kbImpl = [%c(UIKeyboardImpl) activeInstance];
-        delegate = kbImpl.privateInputDelegate ?: kbImpl.inputDelegate;
         UIResponder <UITextInput> *tempDelegate = (UIResponder <UITextInput, UITextInputTokenizer> *)delegate;
         
         UITextPosition *startPositionTemp = tempDelegate.selectedTextRange.start;
@@ -2350,37 +2445,21 @@ NSString *preferencesSelectorForIdentifier(NSString* identifier, int selectorNum
         
         if (!textRange) return;
         selectedString = [delegate textInRange:[delegate selectedTextRange]];
-        
-        float upperCaseProbability = 0.5;
-        NSMutableString *result = [@"" mutableCopy];
-        NSString *lowercaseStrings = [selectedString lowercaseString];
-        
-        for (int i = 0; i < [selectedString length]; i++) {
-            NSString *chString = [lowercaseStrings substringWithRange:NSMakeRange(i, 1)];
-            BOOL toUppercase = arc4random_uniform(1000) / 1000.0 < upperCaseProbability;
+    }
+    switch (spongebobEntropy){
+        case DXStudlyCapsTypeAlternate:
+            [kbImpl insertText:[self capitalizeAlternatively:selectedString]];
+            break;
+        case DXStudlyCapsTypeVowel:
+            [kbImpl insertText:[self capitalize:selectedString phonemes:DXPhonemesTypeVowel]];
+            break;
+        case DXStudlyCapsTypeConsonent:
+            [kbImpl insertText:[self capitalize:selectedString phonemes:DXPhonemesTypeConsonent]];
+            break;
+        default:
+            [kbImpl insertText:[self capitalize:selectedString probability:0.5]];
+            break;
             
-            if (toUppercase) {
-                chString = [chString uppercaseString];
-            }
-            [result appendString:chString];
-        }
-        [kbImpl insertText:result];
-        
-    }else{
-        float upperCaseProbability = 0.5;
-        NSMutableString *result = [@"" mutableCopy];
-        NSString *lowercaseStrings = [selectedString lowercaseString];
-        
-        for (int i = 0; i < [selectedString length]; i++) {
-            NSString *chString = [lowercaseStrings substringWithRange:NSMakeRange(i, 1)];
-            BOOL toUppercase = arc4random_uniform(1000) / 1000.0 < upperCaseProbability;
-            
-            if (toUppercase) {
-                chString = [chString uppercaseString];
-            }
-            [result appendString:chString];
-        }
-        [kbImpl insertText:result];
     }
     [kbImpl clearTransientState];
     [kbImpl clearAnimations];
@@ -3238,6 +3317,17 @@ NSString *preferencesSelectorForIdentifier(NSString* identifier, int selectorNum
      */
 }
 
+-(void)tranzloActionLP:(UILongPressGestureRecognizer *)recognizer{
+    if (recognizer.state == UIGestureRecognizerStateBegan) {
+        [self selectParagraphAction:nil];
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(secondActionDelay * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            [self tranzloAction:nil];
+        });
+    }else if (recognizer.state == UIGestureRecognizerStateEnded){
+        [self shakeView:recognizer.view];
+    }
+}
+
 -(void)globeActionLP:(UILongPressGestureRecognizer *)recognizer{
     if (recognizer.state == UIGestureRecognizerStateBegan) {
         self.parentActionName = [NSStringFromSelector(_cmd) stringByReplacingOccurrencesOfString:@"LP:" withString:@":"];        [self dictationAction:nil];
@@ -3595,7 +3685,8 @@ static void reloadPrefs() {
     }
     
     doubleTapEnabled = preferencesBool(kEnabledDoubleTapkey, NO);
-    
+    spongebobEntropy = preferencesInt(kSpongebobEntropyKey, DXStudlyCapsTypeRandom);
+
     if (isSpringBoard && !firstInit){
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
             //[[PrefsManager sharedInstance] setValue:@YES forKey:kUpdateCachekey fromSandbox:!isSpringBoard];
@@ -3610,8 +3701,8 @@ static void reloadPrefs() {
                 
                 NSKeyedUnarchiver *unarchiver = [[NSKeyedUnarchiver alloc] initForReadingFromData:prefs[kCachekey] error:nil];
                 unarchiver.requiresSecureCoding = NO;
-                int cacheDylibSum = [[unarchiver decodeObjectForKey:@"copyLogDylibExist"] intValue] + [[unarchiver decodeObjectForKey:@"translomaticDylibExist"] intValue] + [[unarchiver decodeObjectForKey:@"wasabiDylibExist"] intValue] + [[unarchiver decodeObjectForKey:@"pasitheaDylibExist"] intValue] + [[unarchiver decodeObjectForKey:@"copypastaDylibExist"] intValue] + [[unarchiver decodeObjectForKey:@"loupeDylibExist"] intValue];
-                int actualDylibSum = [@(shortcutsGenerator.copyLogDylibExist) intValue] + [@(shortcutsGenerator.translomaticDylibExist) intValue] + [@(shortcutsGenerator.wasabiDylibExist) intValue] + [@(shortcutsGenerator.pasitheaDylibExist) intValue] + [@(shortcutsGenerator.copypastaDylibExist) intValue] + [@(shortcutsGenerator.loupeDylibExist) intValue];
+                int cacheDylibSum = [[unarchiver decodeObjectForKey:@"copyLogDylibExist"] intValue] + [[unarchiver decodeObjectForKey:@"translomaticDylibExist"] intValue] + [[unarchiver decodeObjectForKey:@"wasabiDylibExist"] intValue] + [[unarchiver decodeObjectForKey:@"pasitheaDylibExist"] intValue] + [[unarchiver decodeObjectForKey:@"copypastaDylibExist"] intValue] + [[unarchiver decodeObjectForKey:@"loupeDylibExist"] intValue] + [[unarchiver decodeObjectForKey:@"tranzloDylibExist"] intValue];
+                int actualDylibSum = [@(shortcutsGenerator.copyLogDylibExist) intValue] + [@(shortcutsGenerator.translomaticDylibExist) intValue] + [@(shortcutsGenerator.wasabiDylibExist) intValue] + [@(shortcutsGenerator.pasitheaDylibExist) intValue] + [@(shortcutsGenerator.copypastaDylibExist) intValue] + [@(shortcutsGenerator.loupeDylibExist) intValue] + [@(shortcutsGenerator.tranzloDylibExist) intValue];
                 BOOL upgradedFromUnsupportedCache = !([unarchiver containsValueForKey:@"XPadShortcutsFloat"] && [unarchiver containsValueForKey:@"XPadShortcutsBundleFloat"] && [unarchiver containsValueForKey:@"bundleButton"] && [unarchiver containsValueForKey:@"bundleFloatButton"]);
                 [unarchiver finishDecoding];
                 
