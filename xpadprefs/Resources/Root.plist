@@ -29,8 +29,6 @@
 			<string>PSGroupCell</string>
 			<key>label</key>
 			<string>Shortcuts</string>
-			<key>footerText</key>
-			<string>Set the maximum number of visible shortcuts. Everything else will be collapsed into a menu when the space is limited. Double tap gesture is not available in collapsed menu.</string>
 		</dict>
 		<dict>
 			<key>cell</key>
@@ -53,92 +51,6 @@
 			<string>Double Tap</string>
 			<key>PostNotification</key>
 			<string>com.udevs.xpad/prefschanged</string>
-		</dict>
-		<dict>
-			<key>cell</key>
-			<string>PSSegmentCell</string>
-			<key>detail</key>
-			<string>PSSegmentCell</string>
-			<key>validValues</key>
-			<array>
-				<string>1</string>
-				<string>2</string>
-				<string>3</string>
-				<string>4</string>
-				<string>5</string>
-				<string>6</string>
-				<string>7</string>
-				<string>8</string>
-			</array>
-			<key>validTitles</key>
-			<array>
-				<string>1</string>
-				<string>2</string>
-				<string>3</string>
-				<string>4</string>
-				<string>5</string>
-				<string>6</string>
-				<string>7</string>
-				<string>8</string>
-			</array>
-			<key>key</key>
-			<string>maxvisible</string>
-			<key>defaults</key>
-			<string>com.udevs.xpad</string>
-			<key>default</key>
-			<string>4</string>
-			<key>PostNotification</key>
-			<string>com.udevs.xpad/prefschanged</string>
-			<key>id</key>
-			<string>maxvisibleselection</string>
-		</dict>
-		<dict>
-			<key>cell</key>
-			<string>PSGroupCell</string>
-			<key>footerText</key>
-			<string>Set the maximum number of visible shortcuts in floating keyboard mode. Everything else will be collapsed into a menu when the space is limited. Double tap gesture is not available in collapsed menu.</string>
-		</dict>
-		<dict>
-			<key>cell</key>
-			<string>PSSegmentCell</string>
-			<key>detail</key>
-			<string>PSSegmentCell</string>
-			<key>validValues</key>
-			<array>
-				<string>1</string>
-				<string>2</string>
-				<string>3</string>
-				<string>4</string>
-				<string>5</string>
-				<string>6</string>
-				<string>7</string>
-				<string>8</string>
-			</array>
-			<key>validTitles</key>
-			<array>
-				<string>1</string>
-				<string>2</string>
-				<string>3</string>
-				<string>4</string>
-				<string>5</string>
-				<string>6</string>
-				<string>7</string>
-				<string>8</string>
-			</array>
-			<key>key</key>
-			<string>maxvisiblefloat</string>
-			<key>defaults</key>
-			<string>com.udevs.xpad</string>
-			<key>default</key>
-			<string>4</string>
-			<key>PostNotification</key>
-			<string>com.udevs.xpad/prefschanged</string>
-			<key>id</key>
-			<string>maxvisiblefloatselection</string>
-		</dict>
-		<dict>
-			<key>cell</key>
-			<string>PSGroupCell</string>
 		</dict>
 		<dict>
 			<key>cell</key>
@@ -303,6 +215,94 @@
 			<string>com.udevs.xpad/prefschanged</string>
 			<key>id</key>
 			<string>timerslider</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSGroupCell</string>
+			<key>footerText</key>
+			<string>Set the maximum number of visible shortcuts. Everything else will be collapsed into a menu when the space is limited. Double tap gesture is not available in collapsed menu.</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSSegmentCell</string>
+			<key>detail</key>
+			<string>PSSegmentCell</string>
+			<key>validValues</key>
+			<array>
+				<string>1</string>
+				<string>2</string>
+				<string>3</string>
+				<string>4</string>
+				<string>5</string>
+				<string>6</string>
+				<string>7</string>
+				<string>8</string>
+			</array>
+			<key>validTitles</key>
+			<array>
+				<string>1</string>
+				<string>2</string>
+				<string>3</string>
+				<string>4</string>
+				<string>5</string>
+				<string>6</string>
+				<string>7</string>
+				<string>8</string>
+			</array>
+			<key>key</key>
+			<string>maxvisible</string>
+			<key>defaults</key>
+			<string>com.udevs.xpad</string>
+			<key>default</key>
+			<string>4</string>
+			<key>PostNotification</key>
+			<string>com.udevs.xpad/prefschanged</string>
+			<key>id</key>
+			<string>maxvisibleselection</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSGroupCell</string>
+			<key>footerText</key>
+			<string>Set the maximum number of visible shortcuts in floating keyboard mode. Everything else will be collapsed into a menu when the space is limited. Double tap gesture is not available in collapsed menu.</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSSegmentCell</string>
+			<key>detail</key>
+			<string>PSSegmentCell</string>
+			<key>validValues</key>
+			<array>
+				<string>1</string>
+				<string>2</string>
+				<string>3</string>
+				<string>4</string>
+				<string>5</string>
+				<string>6</string>
+				<string>7</string>
+				<string>8</string>
+			</array>
+			<key>validTitles</key>
+			<array>
+				<string>1</string>
+				<string>2</string>
+				<string>3</string>
+				<string>4</string>
+				<string>5</string>
+				<string>6</string>
+				<string>7</string>
+				<string>8</string>
+			</array>
+			<key>key</key>
+			<string>maxvisiblefloat</string>
+			<key>defaults</key>
+			<string>com.udevs.xpad</string>
+			<key>default</key>
+			<string>4</string>
+			<key>PostNotification</key>
+			<string>com.udevs.xpad/prefschanged</string>
+			<key>id</key>
+			<string>maxvisiblefloatselection</string>
 		</dict>
 		<dict>
 			<key>cell</key>

@@ -234,12 +234,13 @@ static XPXPad *xpad;
     
     [self installGesturesForButtonGroupIndex:0 groups:assistantView.leftButtonBar.buttonGroups popOver:NO];
     [self installGesturesForButtonGroupIndex:1 groups:assistantView.leftButtonBar.buttonGroups popOver:NO];
+	__weak typeof(self) weakSelf = self;
     dispatch_async(dispatch_get_main_queue(), ^{
         if (xpad.XPadShortcutsFloatGroup){
-            [self installGesturesForButtonGroupIndex:0 groups:@[xpad.XPadShortcutsFloatGroup] popOver:NO];
+            [weakSelf installGesturesForButtonGroupIndex:0 groups:@[xpad.XPadShortcutsFloatGroup] popOver:NO];
         }
         if (xpad.XPadShortcutsBundleFloatGroup){
-            [self installGesturesForButtonGroupIndex:0 groups:@[xpad.XPadShortcutsBundleFloatGroup] popOver:NO];
+            [weakSelf installGesturesForButtonGroupIndex:0 groups:@[xpad.XPadShortcutsBundleFloatGroup] popOver:NO];
         }
     });
     if (xpad.keyboardInputTypeButton){
@@ -324,25 +325,24 @@ static void sbDidLaunch(){
 %ctor {
     
     @autoreleasepool {
-        // check if process is springboard or an application
-        // this prevents our tweak from running in non-application (with UI)
-        // processes and also prevents bad behaving tweaks to invoke our tweak
         
         NSArray *args = [[NSClassFromString(@"NSProcessInfo") processInfo] arguments];
         
         if (args.count != 0) {
             NSString *executablePath = args[0];
             
-            if (executablePath) {
+            if (executablePath){
                 NSString *processName = [executablePath lastPathComponent];
                 
                 isSpringBoard = [processName isEqualToString:@"SpringBoard"];
                 isApplication = [executablePath rangeOfString:@"/Application"].location != NSNotFound;
-                isApplication = [processName isEqualToString:@"MarkupPhotoExtension"] ?: isApplication;
+				isApplication = isApplication ?: ([executablePath rangeOfString:@".appex/"].location != NSNotFound ?: isApplication);
+                //isApplication = [processName isEqualToString:@"MarkupPhotoExtension"] ?: isApplication;
                 isSafari = [processName isEqualToString:@"MobileSafari"];
-                
+				HBLogDebug(@"isSpringBoard: %d ** isApplication: %d ** isSafari: %d", isSpringBoard, isApplication, isSafari);
+
                 //HBLogDebug(@"processName: %@", processName);
-                if (isSpringBoard || isApplication) {
+                if (isSpringBoard || isApplication){
                     tweakBundle = [NSBundle bundleWithPath:bundlePath];
                     [tweakBundle load];
                     firstInit = YES;
@@ -350,7 +350,7 @@ static void sbDidLaunch(){
                     if ([[NSFileManager defaultManager] fileExistsAtPath:@"/Library/MobileSubstrate/DynamicLibraries/CopyLog.dylib"]){
                         isCopyLogInstalled = YES;
                     }
-                    if ( preferencesBool(kEnabledkey,YES)){
+                    if (preferencesBool(kEnabledkey,YES)){
                         %init(XPAD_GROUP);
                     }
                     CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(), NULL, (CFNotificationCallback)reloadPrefs, (CFStringRef)kPrefsChangedIdentifier, NULL, CFNotificationSuspensionBehaviorDeliverImmediately);
